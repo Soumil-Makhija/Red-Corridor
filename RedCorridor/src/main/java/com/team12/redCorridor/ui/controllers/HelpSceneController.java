@@ -1,5 +1,5 @@
 package com.team12.redCorridor.ui.controllers;
 
-public class HelpSceneController {
+public class HelpSceneController extends Controller {
 
 }
