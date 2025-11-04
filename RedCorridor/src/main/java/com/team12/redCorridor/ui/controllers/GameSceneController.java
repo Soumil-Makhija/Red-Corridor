@@ -1,11 +1,16 @@
 package com.team12.redCorridor.ui.controllers;
 
+import java.io.IOException;
+
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 
 public class GameSceneController extends Controller {
     @FXML
@@ -111,6 +116,50 @@ public class GameSceneController extends Controller {
         playerY = newY;
         map[playerY][playerX] = 2;
         drawMap();
+        evaluateGameState();
+    }
+
+    // simple sample goals so you can test end scenes without game logic wired yet
+    private void evaluateGameState() {
+        if (playerX == 1 && playerY == 1) {
+            showSummaryScene("WinScene.fxml");
+        } else if (playerX == map[0].length - 2 && playerY == map.length - 2) {
+            showSummaryScene("DefeatScene.fxml");
+        }
+    }
+
+    private void showSummaryScene(String resource) {
+        Stage currentStage = stage != null ? stage : getPrimaryStage();
+        if (currentStage == null) {
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/team12/redCorridor/ui/scenes/" + resource));
+            Parent root = loader.load();
+            SummarySceneController summaryController = loader.getController();
+            Scene summaryScene = new Scene(root);
+
+            summaryController.setStage(currentStage);
+            summaryController.recordKey(summaryScene);
+            summaryController.setMapData(copyMapData());
+
+            currentStage.setScene(summaryScene);
+            currentStage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private int[][] copyMapData() {
+        int rows = map.length;
+        int cols = map[0].length;
+        int[][] copy = new int[rows][cols];
+        for (int y = 0; y < rows; y++) {
+            System.arraycopy(map[y], 0, copy[y], 0, cols);
+        }
+        return copy;
     }
 
     @Override
