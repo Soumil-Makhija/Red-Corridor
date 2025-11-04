@@ -127,7 +127,7 @@ src/
 
 ### Files to Create (6 files)
 
-- [ ] `GameUI.java` (main JFrame)
+- [ ] `GameUI.java` (main JavaFX application)
 - [ ] `GamePanel.java` (game rendering panel)
 - [ ] `MenuScreen.java`
 - [ ] `GameOverScreen.java`
@@ -136,7 +136,7 @@ src/
 
 ### Responsibilities
 
-- Window management (JFrame setup)
+- Window management (JavaFX setup)
 - Game rendering loop (60 FPS)
 - All screens (menu, game, pause, game over)
 - HUD elements (health bar, key count, score)
@@ -145,8 +145,8 @@ src/
 
 ### What to Implement
 
-- JFrame/JPanel setup
-- paintComponent() method
+- JavaFX setup
+- Canvas rendering
 - Menu navigation
 - HUD display
 - Render methods for all game objects
