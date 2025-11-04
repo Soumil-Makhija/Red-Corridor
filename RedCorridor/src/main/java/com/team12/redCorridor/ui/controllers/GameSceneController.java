@@ -84,6 +84,17 @@ public class GameSceneController extends Controller {
                 gc.strokeRect(x * cellW, y * cellH, cellW, cellH);
             }
         }
+
+        // temp winning and losing squares (hardcoded)
+        gc.setFill(Color.GREEN);
+        gc.fillRect(1 * cellW, 1 * cellH, cellW, cellH);
+        gc.setStroke(Color.BLACK);
+        gc.strokeRect(1 * cellW, 1 * cellH, cellW, cellH);
+
+        gc.setFill(Color.RED);
+        gc.fillRect(8 * cellW, 8 * cellH, cellW, cellH);
+        gc.setStroke(Color.BLACK);
+        gc.strokeRect(8 * cellW, 8 * cellH, cellW, cellH);
     }
 
     // Movement methods that update player position and redraw
