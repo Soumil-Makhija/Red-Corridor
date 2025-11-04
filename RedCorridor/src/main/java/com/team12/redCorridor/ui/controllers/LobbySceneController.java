@@ -2,12 +2,8 @@ package com.team12.redCorridor.ui.controllers;
 
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.Node;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
-import javafx.event.EventHandler;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import java.io.IOException;
 
@@ -18,28 +14,24 @@ public class LobbySceneController extends Controller {
 
     @Override
     public void recordKey(Scene scene) {
-        scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent event) {
-                // Replace with game-specific handling instead of printing
-                KeyCode e = event.getCode();
-
-                switch (e) {
-                    case H -> helpMenu();
-                    case Q -> quit();
-                    case N -> newGame(event);
-                    case W -> moveUp();
-                    case UP -> moveUp();
-                    case S -> moveDown();
-                    case DOWN -> moveDown();
-                    case A -> moveLeft();
-                    case LEFT -> moveLeft();
-                    case D -> moveRight();
-                    case RIGHT -> moveRight();
-                    default -> System.out.println(e);
+        scene.setOnKeyPressed(event -> {
+            switch (event.getCode()) {
+                case H -> helpMenu();
+                case Q -> quit();
+                case N -> newGame(event);
+                case W -> moveUp();
+                case UP -> moveUp();
+                case S -> moveDown();
+                case DOWN -> moveDown();
+                case A -> moveLeft();
+                case LEFT -> moveLeft();
+                case D -> moveRight();
+                case RIGHT -> moveRight();
+                default -> {
                 }
             }
         });
+
     }
 
     public void moveUp() {
