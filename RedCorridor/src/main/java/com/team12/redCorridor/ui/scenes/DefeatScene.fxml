@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.team12.redCorridor.ui.controllers.DefeatSceneController">
+   <children>
+      <Label layoutX="265.0" layoutY="14.0" text="Failed">
+         <font>
+            <Font name="System Bold" size="22.0" />
+         </font>
+      </Label>
+      <Label layoutX="14.0" layoutY="369.0" text="[N]ew Game" />
+      <Label layoutX="554.0" layoutY="369.0" text="[Q]uit" />
+      <Line endX="300.0" layoutX="300.0" layoutY="52.0" startX="-300.0" />
+      <Line endX="300.0" layoutX="300.0" layoutY="359.0" startX="-300.0" />
+      <Label layoutX="445.0" layoutY="78.0" text="Stats">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </Label>
+      <Pane fx:id="mapPane" layoutX="32.0" layoutY="111.0" prefHeight="224.0" prefWidth="228.0" style="-fx-border-color: black; -fx-background-color: transparent;" />
+      <Label layoutX="340.0" layoutY="131.0" text="Fragments retrieved: " />
+      <Label layoutX="340.0" layoutY="161.0" text="Drones triggered: " />
+      <Label layoutX="341.0" layoutY="192.0" text="Traps triggered" />
+      <Label layoutX="340.0" layoutY="223.0" text="Time taken: " />
+      <Label layoutX="340.0" layoutY="249.0" text="Health remaining: " />
+      <Label layoutX="127.0" layoutY="78.0" text="Map">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>
