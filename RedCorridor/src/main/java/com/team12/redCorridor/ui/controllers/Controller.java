@@ -6,7 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
-import javafx.stage.Modality;
+// import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class Controller {
@@ -57,7 +57,7 @@ public class Controller {
 
             helpStage.setTitle("Help");
             helpStage.initOwner(ownerStage);
-            helpStage.initModality(Modality.WINDOW_MODAL);
+            // helpStage.initModality(Modality.WINDOW_MODAL);
             helpStage.setScene(helpScene);
             helpStage.show();
         } catch (IOException e) {

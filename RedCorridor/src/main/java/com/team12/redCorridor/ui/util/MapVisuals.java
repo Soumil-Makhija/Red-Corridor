@@ -91,6 +91,6 @@ public final class MapVisuals {
             System.err.println("Missing icon: " + ICON_BASE + name);
             return null;
         }
-        return new Image(url.toExternalForm(), true);
+        return new Image(url.toExternalForm(), false);
     }
 }
