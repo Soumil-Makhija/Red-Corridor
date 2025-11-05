@@ -12,7 +12,7 @@ public class HelpSceneController extends Controller {
         scene.setOnKeyPressed(event -> {
             switch (event.getCode()) {
                 case B -> back();
-                case Q -> quit();
+                case L -> lobby();
                 default -> {
                 }
             }

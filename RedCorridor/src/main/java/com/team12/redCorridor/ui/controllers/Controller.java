@@ -28,7 +28,7 @@ public class Controller {
         scene.setOnKeyPressed(event -> {
             switch (event.getCode()) {
                 case H -> helpMenu();
-                case Q -> quit();
+                case L -> lobby();
                 default -> {
                 }
             }
@@ -65,7 +65,7 @@ public class Controller {
         }
     }
 
-    public void quit() {
+    public void lobby() {
         Stage targetStage = getPrimaryStage();
         if (targetStage == null) {
             return;

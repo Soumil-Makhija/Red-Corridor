@@ -13,8 +13,8 @@
       <Label fx:id="timeLabel" layoutX="553.0" layoutY="14.0" text="Time: " />
       <Label fx:id="roomNameLabel" layoutX="283.0" layoutY="53.0" text="Room " />
       <Label fx:id="messageLabel" layoutX="276.0" layoutY="88.0" text="Message" />
-      <Text layoutX="30.0" layoutY="382.0" strokeType="OUTSIDE" strokeWidth="0.0" text="[H]ELP" />
-      <Text layoutX="532.0" layoutY="382.0" strokeType="OUTSIDE" strokeWidth="0.0" text="[Q]UIT" />
+      <Text layoutX="30.0" layoutY="382.0" strokeType="OUTSIDE" strokeWidth="0.0" text="[H]elp" />
+      <Text layoutX="532.0" layoutY="382.0" strokeType="OUTSIDE" strokeWidth="0.0" text="[L]obby" />
       <Line endX="300.0" layoutX="300.0" layoutY="41.0" startX="-300.0" />
       <Line endX="300.0" layoutX="300.0" layoutY="78.0" startX="-300.0" />
       <Line endX="300.0" layoutX="300.0" layoutY="116.0" startX="-300.0" />

@@ -8,7 +8,7 @@ public class WinSceneController extends SummarySceneController {
         scene.setOnKeyPressed(event -> {
             switch (event.getCode()) {
                 case N -> newGame(event);
-                case Q -> quit();
+                case L -> lobby();
                 default -> {
                 }
             }
