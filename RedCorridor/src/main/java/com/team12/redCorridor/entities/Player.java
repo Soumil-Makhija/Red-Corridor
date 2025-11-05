@@ -4,39 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import com.team12.redCorridor.utils.Constants;
 
-
-// This class represents a position on a 2D grid using X and Y coordinates
-class Position {
-    private int x; // X coordinate (horizontal position)
-    private int y; // Y coordinate (vertical position)
-
-    // Constructor: called when you create a new Position
-    // Example: new Position(3, 5) sets x = 3 and y = 5
-    public Position(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
-
-    // Returns the current X value
-    public int getX() {
-        return x;
-    }
-
-    // Returns the current Y value
-    public int getY() {
-        return y;
-    }
-
-    // Changes the X value
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    // Changes the Y value
-    public void setY(int y) {
-        this.y = y;
-    }
-}
 // This enum lists all possible movement directions
 // for the player. Each value represents one direction they can move in.
 enum Direction {

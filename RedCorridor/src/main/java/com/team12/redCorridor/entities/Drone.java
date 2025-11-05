@@ -2,38 +2,6 @@ package com.team12.redCorridor.entities;
 
 import com.team12.redCorridor.utils.Constants;
 
-
-// This class represents a position on a grid using X and Y coordinates
-class Position {
-    private int x, y; // coordinates
-
-    // Constructor - runs when you make a new Position object
-    public Position(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
-
-    // Get the current X value
-    public int getX() { 
-        return x; 
-    }
-
-    // Get the current Y value
-    public int getY() { 
-        return y; 
-    }
-
-    // Change the X value
-    public void setX(int x) { 
-        this.x = x; 
-    }
-
-    // Change the Y value
-    public void setY(int y) { 
-        this.y = y; 
-    }
-}
-
 // This class represents an enemy drone that can move toward the player
 public class Drone {
 

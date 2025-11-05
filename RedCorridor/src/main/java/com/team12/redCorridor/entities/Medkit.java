@@ -1,40 +1,6 @@
 package com.team12.redCorridor.entities;
 
 import com.team12.redCorridor.utils.Constants;
-
-// This class represents a position or point on a 2D grid
-class Position {
-    // x and y store the coordinates
-    private int x;
-    private int y;
-
-    // Constructor: runs when we create a new Position
-    public Position(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
-
-    // Returns the current X coordinate
-    public int getX() {
-        return x;
-    }
-
-    // Returns the current Y coordinate
-    public int getY() {
-        return y;
-    }
-
-    // Updates the X coordinate
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    // Updates the Y coordinate
-    public void setY(int y) {
-        this.y = y;
-    }
-}
-
 // This class represents a healing item called a Medkit
 public class Medkit {
 
