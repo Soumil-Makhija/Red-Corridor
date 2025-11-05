@@ -26,7 +26,7 @@ public class GameSceneController extends Controller {
 
     @FXML
     public void initialize() {
-        initialiseBaseMap();
+        initializeBaseMap();
         playerX = 5;
         playerY = 5;
         map[playerY][playerX] = MapVisuals.PLAYER;
@@ -41,7 +41,7 @@ public class GameSceneController extends Controller {
         drawMap();
     }
 
-    private void initialiseBaseMap() {
+    private void initializeBaseMap() {
         for (int y = 0; y < MAP_SIZE; y++) {
             for (int x = 0; x < MAP_SIZE; x++) {
                 if (x == 0 || y == 0 || x == MAP_SIZE - 1 || y == MAP_SIZE - 1) {
@@ -51,6 +51,14 @@ public class GameSceneController extends Controller {
                 }
             }
         }
+
+        baseMap[4][6] = MapVisuals.WALL;
+        baseMap[4][5] = MapVisuals.WALL;
+        baseMap[4][4] = MapVisuals.WALL;
+        baseMap[5][4] = MapVisuals.WALL;
+        baseMap[6][4] = MapVisuals.WALL;
+        baseMap[6][5] = MapVisuals.WALL;
+        baseMap[6][6] = MapVisuals.WALL;
 
         baseMap[3][3] = MapVisuals.DRONE;
         baseMap[7][5] = MapVisuals.MEDKIT;
