@@ -9,6 +9,7 @@ public class WinSceneController extends SummarySceneController {
             switch (event.getCode()) {
                 case N -> newGame(event);
                 case L -> lobby();
+                case Q -> quit(event);
                 default -> {
                 }
             }

@@ -110,4 +110,11 @@ public class Controller {
             ex.printStackTrace();
         }
     }
+
+    public void quit(KeyEvent event) {
+        Stage currentStage = stage != null ? stage : (Stage) ((Scene) event.getSource()).getWindow();
+        if (currentStage != null) {
+            currentStage.close();
+        }
+    }
 }
