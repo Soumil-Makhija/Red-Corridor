@@ -1,16 +1,19 @@
 package com.team12.redCorridor.ui.controllers;
 
+import com.team12.redCorridor.ui.util.MapVisuals;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 
 public abstract class SummarySceneController extends Controller {
+    private static final int DEFAULT_MAP_SIZE = 10;
+
     @FXML
     protected Pane mapPane;
 
     private Canvas canvas;
+    private GraphicsContext graphicsContext;
     private int[][] mapData;
 
     @FXML
@@ -20,6 +23,7 @@ public abstract class SummarySceneController extends Controller {
         }
 
         canvas = new Canvas(mapPane.getPrefWidth(), mapPane.getPrefHeight());
+        graphicsContext = canvas.getGraphicsContext2D();
         mapPane.getChildren().add(canvas);
         mapPane.widthProperty().addListener((obs, oldVal, newVal) -> resizeCanvas());
         mapPane.heightProperty().addListener((obs, oldVal, newVal) -> resizeCanvas());
@@ -44,51 +48,26 @@ public abstract class SummarySceneController extends Controller {
     }
 
     private void drawMap() {
-        if (canvas == null) {
+        if (graphicsContext == null) {
             return;
         }
 
-        int[][] map = mapData != null ? mapData : defaultMap();
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        double width = canvas.getWidth();
-        double height = canvas.getHeight();
-
-        gc.setFill(Color.WHITE);
-        gc.fillRect(0, 0, width, height);
-
-        int rows = map.length;
-        int cols = map[0].length;
-        double cellWidth = width / cols;
-        double cellHeight = height / rows;
-
-        for (int y = 0; y < rows; y++) {
-            for (int x = 0; x < cols; x++) {
-                int value = map[y][x];
-                switch (value) {
-                    case 1 -> gc.setFill(Color.DARKGRAY);
-                    case 2 -> gc.setFill(Color.CORNFLOWERBLUE);
-                    default -> gc.setFill(Color.LIGHTGRAY);
-                }
-                gc.fillRect(x * cellWidth, y * cellHeight, cellWidth, cellHeight);
-                gc.setStroke(Color.BLACK);
-                gc.strokeRect(x * cellWidth, y * cellHeight, cellWidth, cellHeight);
-            }
-        }
+        int[][] tiles = mapData != null ? mapData : defaultMap();
+        MapVisuals.draw(graphicsContext, tiles);
     }
 
     private int[][] defaultMap() {
-        int size = 10;
-        int[][] defaultMap = new int[size][size];
-        for (int y = 0; y < size; y++) {
-            for (int x = 0; x < size; x++) {
-                if (y == 0 || y == size - 1 || x == 0 || x == size - 1) {
-                    defaultMap[y][x] = 1;
+        int[][] defaultTiles = new int[DEFAULT_MAP_SIZE][DEFAULT_MAP_SIZE];
+        for (int y = 0; y < DEFAULT_MAP_SIZE; y++) {
+            for (int x = 0; x < DEFAULT_MAP_SIZE; x++) {
+                if (y == 0 || y == DEFAULT_MAP_SIZE - 1 || x == 0 || x == DEFAULT_MAP_SIZE - 1) {
+                    defaultTiles[y][x] = MapVisuals.WALL;
                 } else {
-                    defaultMap[y][x] = 0;
+                    defaultTiles[y][x] = MapVisuals.EMPTY;
                 }
             }
         }
-        defaultMap[size / 2][size / 2] = 2;
-        return defaultMap;
+        defaultTiles[DEFAULT_MAP_SIZE / 2][DEFAULT_MAP_SIZE / 2] = MapVisuals.PLAYER;
+        return defaultTiles;
     }
 }
