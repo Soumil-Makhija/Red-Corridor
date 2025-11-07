@@ -1,39 +1,62 @@
 package com.team12.redCorridor.ui.controllers;
 
+import com.team12.redCorridor.entities.Drone;
+import com.team12.redCorridor.entities.KeyFragment;
+import com.team12.redCorridor.entities.Medkit;
+import com.team12.redCorridor.entities.Player;
+import com.team12.redCorridor.entities.Position;
 import com.team12.redCorridor.ui.util.MapVisuals;
+import com.team12.redCorridor.utils.Constants;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
+/**
+ * Controller for Game Scene
+ */
 public class GameSceneController extends Controller {
     private static final int MAP_SIZE = 10;
 
     @FXML
     private Pane mapPane;
+    @FXML
+    private Label hpLabel;
+    @FXML
+    private Label medkitLabel;
+    @FXML
+    private Label fragmentsLabel;
+    @FXML
+    private Label timeLabel;
+    @FXML
+    private Label roomNameLabel;
+    @FXML
+    private Label messageLabel;
+    @FXML
+    private Label roomItemsLabel;
 
     private Canvas canvas;
     private GraphicsContext graphicsContext;
     private final int[][] baseMap = new int[MAP_SIZE][MAP_SIZE]; // static map
-    private final int[][] map = new int[MAP_SIZE][MAP_SIZE]; // dynamic map (store current state)
-    private int playerX;
-    private int playerY;
+    private final int[][] map = new int[MAP_SIZE][MAP_SIZE]; // dynamic map
+
+    private final List<Drone> drones = new ArrayList<>();
+    private Player player;
+    private int totalFragmentsRequired;
 
     @FXML
     public void initialize() {
-        initializeBaseMap(); // create new map (hard coded)
+        initializeBaseMap(); // init static map
+        initializeWorldState(); // init dynamic map
 
-        // hard coded player starting pos
-        playerX = 5;
-        playerY = 5;
-        map[playerY][playerX] = MapVisuals.PLAYER;
-
-        // creating new canvas
         canvas = new Canvas(mapPane.getPrefWidth(), mapPane.getPrefHeight());
         graphicsContext = canvas.getGraphicsContext2D();
         mapPane.getChildren().add(canvas);
@@ -41,13 +64,23 @@ public class GameSceneController extends Controller {
         mapPane.widthProperty().addListener((obs, oldVal, newVal) -> resizeCanvas());
         mapPane.heightProperty().addListener((obs, oldVal, newVal) -> resizeCanvas());
 
+        refreshDynamicMap();
+        updateHud("Use WASD/Arrow keys to move."); // init hud message
         drawMap();
     }
 
-    /*
-     * Currently hard coded map with default objects
-     * Implement random objects
-     */
+    // add dynamic objects to map (currently hardcoded)
+    private void initializeWorldState() {
+        player = new Player(new Position(5, 5));
+        spawnDronesFromBaseMap();
+
+        int fragmentsOnTiles = countFragmentsOnMap();
+        // int fragmentsBehindDoors = registerDoors();
+        // totalFragmentsRequired = fragmentsOnTiles + fragmentsBehindDoors;
+        totalFragmentsRequired = fragmentsOnTiles;
+    }
+
+    // init static objects (currently hard coded)
     private void initializeBaseMap() {
         for (int y = 0; y < MAP_SIZE; y++) {
             for (int x = 0; x < MAP_SIZE; x++) {
@@ -59,6 +92,7 @@ public class GameSceneController extends Controller {
             }
         }
 
+        // hard coded objects
         baseMap[4][6] = MapVisuals.WALL;
         baseMap[4][5] = MapVisuals.WALL;
         baseMap[4][4] = MapVisuals.WALL;
@@ -67,15 +101,52 @@ public class GameSceneController extends Controller {
         baseMap[6][5] = MapVisuals.WALL;
         baseMap[6][6] = MapVisuals.WALL;
 
-        baseMap[3][3] = MapVisuals.DRONE;
-        baseMap[7][5] = MapVisuals.MEDKIT;
-        baseMap[1][1] = MapVisuals.EXIT;
         baseMap[2][8] = MapVisuals.FRAGMENT;
-        baseMap[8][8] = MapVisuals.DANGER;
+        baseMap[1][5] = MapVisuals.FRAGMENT;
+        baseMap[1][7] = MapVisuals.FRAGMENT;
+        baseMap[2][7] = MapVisuals.FRAGMENT;
+        baseMap[5][8] = MapVisuals.FRAGMENT;
+        baseMap[7][6] = MapVisuals.FRAGMENT;
 
-        // sync static objects to dynamic map
+        baseMap[2][1] = MapVisuals.MEDKIT;
+        baseMap[2][3] = MapVisuals.MEDKIT;
+        baseMap[7][3] = MapVisuals.MEDKIT;
+        baseMap[7][2] = MapVisuals.MEDKIT;
+        baseMap[4][2] = MapVisuals.MEDKIT;
+
+        // baseMap[5][2] = MapVisuals.DOOR;
+        // baseMap[7][4] = MapVisuals.DOOR;
+        // baseMap[3][7] = MapVisuals.BLAST_DOOR;
+
+        baseMap[3][3] = MapVisuals.DRONE;
+
+        baseMap[1][1] = MapVisuals.EXIT;
+        baseMap[8][8] = MapVisuals.DANGER;
+    }
+
+    // get total fragments
+    private int countFragmentsOnMap() {
+        int count = 0;
         for (int y = 0; y < MAP_SIZE; y++) {
-            System.arraycopy(baseMap[y], 0, map[y], 0, MAP_SIZE);
+            for (int x = 0; x < MAP_SIZE; x++) {
+                if (baseMap[y][x] == MapVisuals.FRAGMENT) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    // add drones to map
+    private void spawnDronesFromBaseMap() {
+        drones.clear();
+        for (int y = 0; y < MAP_SIZE; y++) {
+            for (int x = 0; x < MAP_SIZE; x++) {
+                if (baseMap[y][x] == MapVisuals.DRONE) {
+                    drones.add(new Drone(new Position(x, y)));
+                    baseMap[y][x] = MapVisuals.EMPTY;
+                }
+            }
         }
     }
 
@@ -87,7 +158,7 @@ public class GameSceneController extends Controller {
         drawMap();
     }
 
-    // displaying icons for objects
+    // display icons on map
     private void drawMap() {
         if (graphicsContext == null) {
             return;
@@ -95,53 +166,163 @@ public class GameSceneController extends Controller {
         MapVisuals.draw(graphicsContext, map);
     }
 
-    // movement methods that update player position and redraw
+    // handles player movements
     public void moveUp() {
-        attemptMove(playerX, playerY - 1);
+        attemptMove(playerX(), playerY() - 1);
     }
 
     public void moveDown() {
-        attemptMove(playerX, playerY + 1);
+        attemptMove(playerX(), playerY() + 1);
     }
 
     public void moveLeft() {
-        attemptMove(playerX - 1, playerY);
+        attemptMove(playerX() - 1, playerY());
     }
 
     public void moveRight() {
-        attemptMove(playerX + 1, playerY);
+        attemptMove(playerX() + 1, playerY());
     }
 
     private void attemptMove(int newX, int newY) {
-        // validate moves
-        if (newX < 0 || newX >= MAP_SIZE || newY < 0 || newY >= MAP_SIZE) {
-            return;
-        }
-        if (baseMap[newY][newX] == MapVisuals.WALL) {
+        if (!isWithinBounds(newX, newY) || !isWalkable(newX, newY)) {
             return;
         }
 
-        // update pos
-        map[playerY][playerX] = baseMap[playerY][playerX];
-        playerX = newX;
-        playerY = newY;
-        map[playerY][playerX] = MapVisuals.PLAYER;
+        // get object at that tile
+        int tileValue = baseMap[newY][newX];
+        if (tileValue == MapVisuals.WALL) {
+            return;
+        }
+        if (tileValue == MapVisuals.EXIT && !hasCollectedAllFragments()) {
+            updateHud("Exit locked. Collect all fragments to unlock");
+            return;
+        }
 
-        drawMap(); // display new map
+        // update player pos
+        player.getPosition().setX(newX);
+        player.getPosition().setY(newY);
+
+        String interactionMessage = handleTileInteraction(newX, newY, tileValue); // action handler
+        int droneDamage = moveDronesTowardPlayer(); // move drones after player move
+        String statusMessage = droneDamage > 0 ? "Drone caught you! -" + droneDamage + " HP" : interactionMessage;
+
+        refreshDynamicMap(); // update pos
+        updateHud(statusMessage); // update hud message
+        drawMap(); // update icons
         evaluateGameState(); // check end game conditions
+    }
+
+    // handles action for different objects
+    private String handleTileInteraction(int x, int y, int tile) {
+        return switch (tile) {
+            case MapVisuals.FRAGMENT -> collectFragmentAt(new Position(x, y), "Fragment");
+            case MapVisuals.MEDKIT -> applyMedkit(new Position(x, y));
+            // case MapVisuals.DOOR, MapVisuals.BLAST_DOOR -> handleDoorInteraction(x, y);
+            case MapVisuals.EXIT -> hasCollectedAllFragments() ? "Exit door unlocked." : null;
+            default -> null;
+        };
+    }
+
+    // handles player collecting fragment
+    private String collectFragmentAt(Position position, String sourceLabel) {
+        // update players inventory
+        KeyFragment fragment = new KeyFragment(new Position(position.getX(), position.getY()));
+        fragment.collect();
+        player.addFragment(fragment);
+        baseMap[position.getY()][position.getX()] = MapVisuals.EMPTY; // remove fragment
+
+        return "Fragment collected";
+    }
+
+    /*
+     * change this to applying medkit later
+     */
+    // handles player collecting medkit
+    private String applyMedkit(Position position) {
+        // update players inventory
+        Medkit medkit = new Medkit(new Position(position.getX(), position.getY()));
+        player.addMedkit();
+        player.heal(medkit.getHealAmount());
+        baseMap[position.getY()][position.getX()] = MapVisuals.EMPTY; // remove medkit
+        return "Medkit restored +" + medkit.getHealAmount() + " HP";
+    }
+
+    // validate all fragments collected
+    private boolean hasCollectedAllFragments() {
+        if (totalFragmentsRequired <= 0) {
+            return true;
+        }
+        return player.getFragmentCount() >= totalFragmentsRequired;
+    }
+
+    // handles drones movement
+    private int moveDronesTowardPlayer() {
+        if (drones.isEmpty()) {
+            return 0;
+        }
+
+        int totalDamage = 0;
+        for (Drone drone : drones) {
+            if (!drone.isActive()) { // check drones status
+                continue;
+            }
+
+            Position dronePosition = drone.getPosition();
+            int originalX = dronePosition.getX();
+            int originalY = dronePosition.getY();
+
+            drone.moveToward(player.getPosition()); // movement
+
+            // validate move
+            int targetX = dronePosition.getX();
+            int targetY = dronePosition.getY();
+            if (!isWithinBounds(targetX, targetY) || !isWalkable(targetX, targetY)) {
+                dronePosition.setX(originalX);
+                dronePosition.setY(originalY);
+            }
+
+            // if drone hit player
+            if (dronePosition.getX() == playerX() && dronePosition.getY() == playerY()) {
+                player.takeDamage(drone.getDamage());
+                drone.deactivate();
+                totalDamage += drone.getDamage();
+            }
+        }
+        return totalDamage;
+    }
+
+    // update drones and players pos
+    private void refreshDynamicMap() {
+        for (int y = 0; y < MAP_SIZE; y++) {
+            System.arraycopy(baseMap[y], 0, map[y], 0, MAP_SIZE);
+        }
+
+        for (Drone drone : drones) {
+            if (drone.isActive()) {
+                Position pos = drone.getPosition();
+                map[pos.getY()][pos.getX()] = MapVisuals.DRONE;
+            }
+        }
+
+        map[playerY()][playerX()] = MapVisuals.PLAYER;
     }
 
     // check end game conditions
     private void evaluateGameState() {
-        // currently hard coded for testing
-        if (playerX == 1 && playerY == 1) {
+        if (player.getHealth() <= 0) {
+            showSummaryScene("DefeatScene.fxml");
+            return;
+        }
+
+        // hard coded
+        if (playerX() == 1 && playerY() == 1 && hasCollectedAllFragments()) {
             showSummaryScene("WinScene.fxml");
-        } else if (playerX == MAP_SIZE - 2 && playerY == MAP_SIZE - 2) {
+        } else if (playerX() == MAP_SIZE - 2 && playerY() == MAP_SIZE - 2) {
             showSummaryScene("DefeatScene.fxml");
         }
     }
 
-    // End game scenes
+    // switch to win/defeat scene
     private void showSummaryScene(String resource) {
         Stage currentStage = stage != null ? stage : getPrimaryStage();
         if (currentStage == null) {
@@ -149,7 +330,6 @@ public class GameSceneController extends Controller {
         }
 
         try {
-            // get win/defeat scene
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/com/team12/redCorridor/ui/scenes/" + resource));
             Parent root = loader.load();
@@ -167,8 +347,8 @@ public class GameSceneController extends Controller {
         }
     }
 
-    // copy map to display in summary scene
     private int[][] copyMapData() {
+        refreshDynamicMap();
         int[][] copy = new int[MAP_SIZE][MAP_SIZE];
         for (int y = 0; y < MAP_SIZE; y++) {
             System.arraycopy(map[y], 0, copy[y], 0, MAP_SIZE);
@@ -191,5 +371,52 @@ public class GameSceneController extends Controller {
                 }
             }
         });
+    }
+
+    // validating move methods
+    private boolean isWithinBounds(int x, int y) {
+        return x >= 0 && x < MAP_SIZE && y >= 0 && y < MAP_SIZE;
+    }
+
+    private boolean isWalkable(int x, int y) {
+        return baseMap[y][x] != MapVisuals.WALL;
+    }
+
+    private int playerX() {
+        return player.getPosition().getX();
+    }
+
+    private int playerY() {
+        return player.getPosition().getY();
+    }
+
+    // update hud message
+    private void updateHud(String newMessage) {
+        if (hpLabel != null) {
+            hpLabel.setText("HP: " + player.getHealth() + "/" + Constants.PLAYER_MAX_HEALTH);
+        }
+        if (medkitLabel != null) {
+            medkitLabel.setText("Medkits: " + player.getMedkitCount());
+        }
+        if (fragmentsLabel != null) {
+            String fragmentProgress = totalFragmentsRequired > 0
+                    ? player.getFragmentCount() + "/" + totalFragmentsRequired
+                    : String.valueOf(player.getFragmentCount());
+            fragmentsLabel.setText("Fragments: " + fragmentProgress);
+        }
+        if (timeLabel != null) {
+            timeLabel.setText("Time: --:--");
+        }
+        if (roomNameLabel != null && (roomNameLabel.getText() == null || roomNameLabel.getText().isBlank())) {
+            roomNameLabel.setText("Red Corridor");
+        }
+        if (roomItemsLabel != null && (roomItemsLabel.getText() == null || roomItemsLabel.getText().isBlank())) {
+            roomItemsLabel.setText("Track items by exploring the map.");
+        }
+        if (newMessage != null && messageLabel != null) {
+            messageLabel.setText(newMessage);
+        } else if (messageLabel != null && messageLabel.getText() == null) {
+            messageLabel.setText("");
+        }
     }
 }
