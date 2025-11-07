@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 
 /**
@@ -15,10 +16,21 @@ public abstract class SummarySceneController extends Controller {
 
     @FXML
     protected Pane mapPane;
+    @FXML
+    private Label fragmentsStatLabel;
+    @FXML
+    private Label dronesStatLabel;
+    @FXML
+    private Label trapsStatLabel;
+    @FXML
+    private Label timeStatLabel;
+    @FXML
+    private Label healthStatLabel;
 
     private Canvas canvas;
     private GraphicsContext graphicsContext;
     private int[][] mapData;
+    private SummaryStats summaryStats;
 
     @FXML
     private void initialize() {
@@ -33,11 +45,17 @@ public abstract class SummarySceneController extends Controller {
         mapPane.widthProperty().addListener((obs, oldVal, newVal) -> resizeCanvas());
         mapPane.heightProperty().addListener((obs, oldVal, newVal) -> resizeCanvas());
         drawMap(); // display icons
+        updateStatLabels();
     }
 
     public void setMapData(int[][] mapData) {
         this.mapData = mapData;
         drawMap();
+    }
+
+    public void setStats(SummaryStats stats) {
+        this.summaryStats = stats;
+        updateStatLabels();
     }
 
     private void resizeCanvas() {
@@ -60,6 +78,31 @@ public abstract class SummarySceneController extends Controller {
 
         int[][] tiles = mapData != null ? mapData : defaultMap();
         MapVisuals.draw(graphicsContext, tiles);
+    }
+
+    private void updateStatLabels() {
+        if (summaryStats == null) {
+            return;
+        }
+
+        if (fragmentsStatLabel != null) {
+            String fragmentProgress = summaryStats.getFragmentsRequired() > 0
+                    ? summaryStats.getFragmentsCollected() + "/" + summaryStats.getFragmentsRequired()
+                    : String.valueOf(summaryStats.getFragmentsCollected());
+            fragmentsStatLabel.setText("Fragments retrieved: " + fragmentProgress);
+        }
+        if (dronesStatLabel != null) {
+            dronesStatLabel.setText("Drones triggered: " + summaryStats.getDronesTriggered());
+        }
+        if (trapsStatLabel != null) {
+            trapsStatLabel.setText("Hazards triggered: " + summaryStats.getHazardsTriggered());
+        }
+        if (timeStatLabel != null) {
+            timeStatLabel.setText("Time taken: " + formatElapsedTime(summaryStats.getElapsedMillis()));
+        }
+        if (healthStatLabel != null) {
+            healthStatLabel.setText("Health remaining: " + summaryStats.getHealthRemaining());
+        }
     }
 
     private int[][] defaultMap() {
@@ -88,5 +131,15 @@ public abstract class SummarySceneController extends Controller {
                 }
             }
         });
+    }
+
+    private String formatElapsedTime(long elapsedMillis) {
+        if (elapsedMillis <= 0) {
+            return "--:--";
+        }
+        long totalSeconds = elapsedMillis / 1000;
+        long minutes = totalSeconds / 60;
+        long seconds = totalSeconds % 60;
+        return String.format("%02d:%02d", minutes, seconds);
     }
 }

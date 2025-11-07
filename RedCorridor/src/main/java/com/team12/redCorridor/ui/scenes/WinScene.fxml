@@ -59,11 +59,11 @@
                      </font>
                   </Label>
                   <Separator />
-                  <Label prefHeight="17.0" prefWidth="336.0" text="Fragments retrieved:" />
-                  <Label prefHeight="17.0" prefWidth="267.0" text="Drones triggered:" />
-                  <Label prefHeight="17.0" prefWidth="290.0" text="Traps triggered:" />
-                  <Label prefHeight="17.0" prefWidth="275.0" text="Time taken:" />
-                  <Label prefHeight="17.0" prefWidth="305.0" text="Health remaining:" />
+                  <Label fx:id="fragmentsStatLabel" prefHeight="17.0" prefWidth="336.0" text="Fragments retrieved: --" />
+                  <Label fx:id="dronesStatLabel" prefHeight="17.0" prefWidth="267.0" text="Drones triggered: --" />
+                  <Label fx:id="trapsStatLabel" prefHeight="17.0" prefWidth="290.0" text="Hazards triggered: --" />
+                  <Label fx:id="timeStatLabel" prefHeight="17.0" prefWidth="275.0" text="Time taken: --:--" />
+                  <Label fx:id="healthStatLabel" prefHeight="17.0" prefWidth="305.0" text="Health remaining: --" />
                </children>
             </VBox>
          </children>
