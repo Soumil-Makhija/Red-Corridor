@@ -25,6 +25,7 @@ import javafx.stage.Stage;
  */
 public class GameSceneController extends Controller {
     private static final int MAP_SIZE = 10;
+    private static final int HAZARD_DAMAGE = 80;
 
     @FXML
     private Pane mapPane;
@@ -51,6 +52,9 @@ public class GameSceneController extends Controller {
     private final List<Drone> drones = new ArrayList<>();
     private Player player;
     private int totalFragmentsRequired;
+    private int dronesTriggeredCount;
+    private int hazardsTriggeredCount;
+    private long startTimeMillis;
 
     @FXML
     public void initialize() {
@@ -73,6 +77,9 @@ public class GameSceneController extends Controller {
     private void initializeWorldState() {
         player = new Player(new Position(5, 5));
         spawnDronesFromBaseMap();
+        dronesTriggeredCount = 0;
+        hazardsTriggeredCount = 0;
+        startTimeMillis = System.currentTimeMillis();
 
         int fragmentsOnTiles = countFragmentsOnMap();
         // int fragmentsBehindDoors = registerDoors();
@@ -119,6 +126,8 @@ public class GameSceneController extends Controller {
         // baseMap[3][7] = MapVisuals.BLAST_DOOR;
 
         baseMap[3][3] = MapVisuals.DRONE;
+        baseMap[3][4] = MapVisuals.DRONE;
+        baseMap[3][5] = MapVisuals.DRONE;
 
         baseMap[1][1] = MapVisuals.EXIT;
         baseMap[8][8] = MapVisuals.DANGER;
@@ -217,6 +226,7 @@ public class GameSceneController extends Controller {
         return switch (tile) {
             case MapVisuals.FRAGMENT -> collectFragmentAt(new Position(x, y), "Fragment");
             case MapVisuals.MEDKIT -> applyMedkit(new Position(x, y));
+            case MapVisuals.DANGER -> triggerHazard(new Position(x, y));
             // case MapVisuals.DOOR, MapVisuals.BLAST_DOOR -> handleDoorInteraction(x, y);
             case MapVisuals.EXIT -> hasCollectedAllFragments() ? "Exit door unlocked." : null;
             default -> null;
@@ -245,6 +255,13 @@ public class GameSceneController extends Controller {
         player.heal(medkit.getHealAmount());
         baseMap[position.getY()][position.getX()] = MapVisuals.EMPTY; // remove medkit
         return "Medkit restored +" + medkit.getHealAmount() + " HP";
+    }
+
+    private String triggerHazard(Position position) {
+        hazardsTriggeredCount++;
+        baseMap[position.getY()][position.getX()] = MapVisuals.EMPTY;
+        player.takeDamage(HAZARD_DAMAGE);
+        return "Hazard triggered! -" + HAZARD_DAMAGE + " HP";
     }
 
     // validate all fragments collected
@@ -285,6 +302,7 @@ public class GameSceneController extends Controller {
             if (dronePosition.getX() == playerX() && dronePosition.getY() == playerY()) {
                 player.takeDamage(drone.getDamage());
                 drone.deactivate();
+                dronesTriggeredCount++;
                 totalDamage += drone.getDamage();
             }
         }
@@ -317,8 +335,6 @@ public class GameSceneController extends Controller {
         // hard coded
         if (playerX() == 1 && playerY() == 1 && hasCollectedAllFragments()) {
             showSummaryScene("WinScene.fxml");
-        } else if (playerX() == MAP_SIZE - 2 && playerY() == MAP_SIZE - 2) {
-            showSummaryScene("DefeatScene.fxml");
         }
     }
 
@@ -339,6 +355,7 @@ public class GameSceneController extends Controller {
             summaryController.setStage(currentStage);
             summaryController.recordKey(summaryScene);
             summaryController.setMapData(copyMapData());
+            summaryController.setStats(buildSummaryStats());
 
             currentStage.setScene(summaryScene);
             currentStage.show();
@@ -405,7 +422,7 @@ public class GameSceneController extends Controller {
             fragmentsLabel.setText("Fragments: " + fragmentProgress);
         }
         if (timeLabel != null) {
-            timeLabel.setText("Time: --:--");
+            timeLabel.setText("Time: " + formatElapsedTime(elapsedMillis()));
         }
         if (roomNameLabel != null && (roomNameLabel.getText() == null || roomNameLabel.getText().isBlank())) {
             roomNameLabel.setText("Red Corridor");
@@ -418,5 +435,29 @@ public class GameSceneController extends Controller {
         } else if (messageLabel != null && messageLabel.getText() == null) {
             messageLabel.setText("");
         }
+    }
+
+    private SummaryStats buildSummaryStats() {
+        return new SummaryStats(
+                player.getFragmentCount(),
+                totalFragmentsRequired,
+                dronesTriggeredCount,
+                hazardsTriggeredCount,
+                elapsedMillis(),
+                player.getHealth());
+    }
+
+    private long elapsedMillis() {
+        return startTimeMillis > 0 ? System.currentTimeMillis() - startTimeMillis : 0;
+    }
+
+    private String formatElapsedTime(long elapsedMillis) {
+        if (elapsedMillis <= 0) {
+            return "--:--";
+        }
+        long totalSeconds = elapsedMillis / 1000;
+        long minutes = totalSeconds / 60;
+        long seconds = totalSeconds % 60;
+        return String.format("%02d:%02d", minutes, seconds);
     }
 }
