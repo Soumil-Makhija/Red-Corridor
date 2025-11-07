@@ -10,6 +10,8 @@ import com.team12.redCorridor.utils.Constants;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -19,6 +21,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 /**
  * Controller for Game Scene
@@ -55,7 +58,26 @@ public class GameSceneController extends Controller {
     private int dronesTriggeredCount;
     private int hazardsTriggeredCount;
     private long startTimeMillis;
+    private Timeline timerTimeline;
 
+    // get key options from user
+    @Override
+    public void recordKey(Scene scene) {
+        scene.setOnKeyPressed(event -> {
+            switch (event.getCode()) {
+                case W, UP -> moveUp();
+                case S, DOWN -> moveDown();
+                case A, LEFT -> moveLeft();
+                case D, RIGHT -> moveRight();
+                case H -> helpMenu();
+                case L -> lobby();
+                default -> {
+                }
+            }
+        });
+    }
+
+    // init game scene
     @FXML
     public void initialize() {
         initializeBaseMap(); // init static map
@@ -68,9 +90,10 @@ public class GameSceneController extends Controller {
         mapPane.widthProperty().addListener((obs, oldVal, newVal) -> resizeCanvas());
         mapPane.heightProperty().addListener((obs, oldVal, newVal) -> resizeCanvas());
 
-        refreshDynamicMap();
+        refreshDynamicMap(); // update dynamic objects
         updateHud("Use WASD/Arrow keys to move."); // init hud message
-        drawMap();
+        drawMap(); // display icons
+        startTimer();
     }
 
     // add dynamic objects to map (currently hardcoded)
@@ -257,6 +280,7 @@ public class GameSceneController extends Controller {
         return "Medkit restored +" + medkit.getHealAmount() + " HP";
     }
 
+    // handles traps trigger
     private String triggerHazard(Position position) {
         hazardsTriggeredCount++;
         baseMap[position.getY()][position.getX()] = MapVisuals.EMPTY;
@@ -340,6 +364,7 @@ public class GameSceneController extends Controller {
 
     // switch to win/defeat scene
     private void showSummaryScene(String resource) {
+        stopTimer();
         Stage currentStage = stage != null ? stage : getPrimaryStage();
         if (currentStage == null) {
             return;
@@ -373,23 +398,6 @@ public class GameSceneController extends Controller {
         return copy;
     }
 
-    // get key options from user
-    @Override
-    public void recordKey(Scene scene) {
-        scene.setOnKeyPressed(event -> {
-            switch (event.getCode()) {
-                case W, UP -> moveUp();
-                case S, DOWN -> moveDown();
-                case A, LEFT -> moveLeft();
-                case D, RIGHT -> moveRight();
-                case H -> helpMenu();
-                case L -> lobby();
-                default -> {
-                }
-            }
-        });
-    }
-
     // validating move methods
     private boolean isWithinBounds(int x, int y) {
         return x >= 0 && x < MAP_SIZE && y >= 0 && y < MAP_SIZE;
@@ -421,9 +429,7 @@ public class GameSceneController extends Controller {
                     : String.valueOf(player.getFragmentCount());
             fragmentsLabel.setText("Fragments: " + fragmentProgress);
         }
-        if (timeLabel != null) {
-            timeLabel.setText("Time: " + formatElapsedTime(elapsedMillis()));
-        }
+        updateTimeLabel();
         if (roomNameLabel != null && (roomNameLabel.getText() == null || roomNameLabel.getText().isBlank())) {
             roomNameLabel.setText("Red Corridor");
         }
@@ -437,6 +443,31 @@ public class GameSceneController extends Controller {
         }
     }
 
+    // handles timer for each game
+    private void startTimer() {
+        stopTimer();
+        timerTimeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> updateTimeLabel()));
+        timerTimeline.setCycleCount(Timeline.INDEFINITE); // repeat indefinitely
+        timerTimeline.playFromStart();
+        updateTimeLabel(); //
+    }
+
+    private void stopTimer() {
+        if (timerTimeline != null) {
+            timerTimeline.stop();
+            timerTimeline = null;
+        }
+    }
+
+    // update label in game scene
+    private void updateTimeLabel() {
+        if (timeLabel == null) {
+            return;
+        }
+        timeLabel.setText("Time: " + formatElapsedTime(elapsedMillis()));
+    }
+
+    // update summary stats to display
     private SummaryStats buildSummaryStats() {
         return new SummaryStats(
                 player.getFragmentCount(),
@@ -447,10 +478,12 @@ public class GameSceneController extends Controller {
                 player.getHealth());
     }
 
+    // store time in milliseconds
     private long elapsedMillis() {
         return startTimeMillis > 0 ? System.currentTimeMillis() - startTimeMillis : 0;
     }
 
+    // get minutes and seconds from milliseconds
     private String formatElapsedTime(long elapsedMillis) {
         if (elapsedMillis <= 0) {
             return "--:--";
