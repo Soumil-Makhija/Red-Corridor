@@ -6,6 +6,7 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
 public final class MapVisuals {
+    // simple enum for objects
     public static final int EMPTY = 0;
     public static final int WALL = 1;
     public static final int PLAYER = 2;
@@ -15,6 +16,7 @@ public final class MapVisuals {
     public static final int DANGER = 6;
     public static final int FRAGMENT = 7;
 
+    // icons path
     private static final String ICON_BASE = "/com/team12/redCorridor/ui/icons/";
     private static final Image WALL_IMAGE = loadImage("wall.png");
     private static final Image PLAYER_IMAGE = loadImage("user.png");
@@ -27,11 +29,13 @@ public final class MapVisuals {
     private MapVisuals() {
     }
 
+    // display icons on map
     public static void draw(GraphicsContext gc, int[][] tiles) {
         if (gc == null || tiles == null || tiles.length == 0 || tiles[0].length == 0) {
             return;
         }
 
+        // get canvas
         double canvasWidth = gc.getCanvas().getWidth();
         double canvasHeight = gc.getCanvas().getHeight();
         int rows = tiles.length;
@@ -46,24 +50,28 @@ public final class MapVisuals {
                 double cellX = x * cellWidth;
                 double cellY = y * cellHeight;
 
+                // fill tiles' background with light gray
                 gc.setFill(Color.LIGHTGRAY);
                 gc.fillRect(cellX, cellY, cellWidth, cellHeight);
 
+                // draw icons on tiles
                 if (value == WALL && WALL_IMAGE != null) {
                     gc.drawImage(WALL_IMAGE, cellX, cellY, cellWidth, cellHeight);
                 } else {
-                    Image icon = iconFor(value);
+                    Image icon = iconFor(value); // get icon
                     if (icon != null) {
                         drawCentered(gc, icon, cellX, cellY, cellWidth, cellHeight, iconSize);
                     }
                 }
 
+                // make tiles' border visible
                 gc.setStroke(Color.BLACK);
                 gc.strokeRect(cellX, cellY, cellWidth, cellHeight);
             }
         }
     }
 
+    // draw icons at tile's center
     private static void drawCentered(GraphicsContext gc, Image image, double cellX, double cellY,
             double cellWidth, double cellHeight, double targetSize) {
         double width = targetSize;
@@ -73,6 +81,7 @@ public final class MapVisuals {
         gc.drawImage(image, x, y, width, height);
     }
 
+    // get icons image path
     private static Image iconFor(int value) {
         return switch (value) {
             case PLAYER -> PLAYER_IMAGE;
@@ -85,6 +94,7 @@ public final class MapVisuals {
         };
     }
 
+    // load image from path
     private static Image loadImage(String name) {
         URL url = MapVisuals.class.getResource(ICON_BASE + name);
         if (url == null) {

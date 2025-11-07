@@ -2,12 +2,16 @@ package com.team12.redCorridor.ui.controllers;
 
 import com.team12.redCorridor.ui.util.MapVisuals;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Pane;
 
+/**
+ * Abstract Controller for Summary Scenes
+ */
 public abstract class SummarySceneController extends Controller {
-    private static final int DEFAULT_MAP_SIZE = 10;
+    private static final int DEFAULT_MAP_SIZE = 10; // hard coded
 
     @FXML
     protected Pane mapPane;
@@ -22,12 +26,13 @@ public abstract class SummarySceneController extends Controller {
             return;
         }
 
+        // creating new map
         canvas = new Canvas(mapPane.getPrefWidth(), mapPane.getPrefHeight());
         graphicsContext = canvas.getGraphicsContext2D();
         mapPane.getChildren().add(canvas);
         mapPane.widthProperty().addListener((obs, oldVal, newVal) -> resizeCanvas());
         mapPane.heightProperty().addListener((obs, oldVal, newVal) -> resizeCanvas());
-        drawMap();
+        drawMap(); // display icons
     }
 
     public void setMapData(int[][] mapData) {
@@ -47,6 +52,7 @@ public abstract class SummarySceneController extends Controller {
         drawMap();
     }
 
+    // display icons on map
     private void drawMap() {
         if (graphicsContext == null) {
             return;
@@ -69,5 +75,18 @@ public abstract class SummarySceneController extends Controller {
         }
         defaultTiles[DEFAULT_MAP_SIZE / 2][DEFAULT_MAP_SIZE / 2] = MapVisuals.PLAYER;
         return defaultTiles;
+    }
+
+    // get key options from user
+    public void recordKey(Scene scene) {
+        scene.setOnKeyPressed(event -> {
+            switch (event.getCode()) {
+                case N -> newGame(event);
+                case L -> lobby();
+                case Q -> quit(event);
+                default -> {
+                }
+            }
+        });
     }
 }

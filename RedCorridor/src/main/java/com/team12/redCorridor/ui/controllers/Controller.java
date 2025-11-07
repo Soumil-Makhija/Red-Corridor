@@ -9,7 +9,10 @@ import javafx.scene.input.KeyEvent;
 // import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-public class Controller {
+/**
+ * Abstract Controller for all scenes
+ */
+public abstract class Controller {
     protected Stage stage;
     private static Stage primaryStage;
 
@@ -24,6 +27,7 @@ public class Controller {
         return primaryStage != null ? primaryStage : stage;
     }
 
+    // get key options from user
     public void recordKey(Scene scene) {
         scene.setOnKeyPressed(event -> {
             switch (event.getCode()) {
@@ -35,6 +39,7 @@ public class Controller {
         });
     }
 
+    // switch scene to help menu (new window)
     public void helpMenu() {
         Stage ownerStage = stage != null ? stage : getPrimaryStage();
         if (ownerStage == null) {
@@ -42,6 +47,7 @@ public class Controller {
         }
 
         try {
+            // getting scene
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/com/team12/redCorridor/ui/scenes/HelpScene.fxml"));
             Parent root = loader.load();
@@ -50,11 +56,13 @@ public class Controller {
             Stage helpStage = new Stage();
             Scene helpScene = new Scene(root);
 
+            // set previous stage to go back
             controller.setStage(helpStage);
             controller.setPreviousStage(ownerStage);
             controller.setPreviousScene(ownerStage.getScene());
             controller.recordKey(helpScene);
 
+            // new window
             helpStage.setTitle("Help");
             helpStage.initOwner(ownerStage);
             // helpStage.initModality(Modality.WINDOW_MODAL);
@@ -65,6 +73,7 @@ public class Controller {
         }
     }
 
+    // switch to lobby scene
     public void lobby() {
         Stage targetStage = getPrimaryStage();
         if (targetStage == null) {
@@ -76,10 +85,11 @@ public class Controller {
         }
 
         try {
+            // get lobby scene
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/com/team12/redCorridor/ui/scenes/LobbyScene.fxml"));
             Parent root = loader.load();
-            LobbySceneController lobbyController = loader.getController();
+            LobbySceneController lobbyController = loader.getController(); // get controller
             Scene lobbyScene = new Scene(root);
 
             targetStage.setScene(lobbyScene);
@@ -93,15 +103,19 @@ public class Controller {
         }
     }
 
+    // switching to new game scene
     public void newGame(KeyEvent event) {
         try {
+            // get game scene
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/com/team12/redCorridor/ui/scenes/GameScene.fxml"));
 
             Parent root = loader.load();
-            GameSceneController controller = loader.getController();
+            GameSceneController controller = loader.getController(); // game scene controller
+            // new game on same window
             Stage currentStage = stage != null ? stage : (Stage) ((Scene) event.getSource()).getWindow();
             Scene gameScene = new Scene(root);
+
             controller.setStage(currentStage);
             controller.recordKey(gameScene);
             currentStage.setScene(gameScene);
@@ -111,6 +125,7 @@ public class Controller {
         }
     }
 
+    // program exit
     public void quit(KeyEvent event) {
         Stage currentStage = stage != null ? stage : (Stage) ((Scene) event.getSource()).getWindow();
         if (currentStage != null) {

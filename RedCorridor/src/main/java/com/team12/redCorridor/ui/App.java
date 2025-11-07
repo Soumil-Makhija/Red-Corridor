@@ -7,6 +7,9 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+/**
+ * UI main class
+ */
 public class App extends Application {
     Controller controller;
 
@@ -14,9 +17,11 @@ public class App extends Application {
         launch(args);
     }
 
+    // Program entry point
     @Override
     public void start(Stage stage) throws Exception {
         try {
+            // starts at lobby scene
             FXMLLoader loader = new FXMLLoader(getClass().getResource("scenes/LobbyScene.fxml"));
             Parent root = loader.load();
             stage.setTitle("RedCorridor");
