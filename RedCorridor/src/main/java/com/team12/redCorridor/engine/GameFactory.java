@@ -1,7 +1,10 @@
 package com.team12.redCorridor.engine;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Random;
 
 import com.team12.redCorridor.entities.Drone;
 import com.team12.redCorridor.entities.Player;
@@ -9,20 +12,24 @@ import com.team12.redCorridor.entities.Position;
 import com.team12.redCorridor.ui.util.MapVisuals;
 
 /**
- * GameFactory is responsible for creating initial game worlds / maps and
- * populating them with simple entities (player, obstacles, etc).
- * Keep factory logic here so world creation is centralised and easy to change.
+ * Builds the world by loading one of the authored mazes (15x15 with 13x13
+ * playable interior) and scattering interactive objects across the walkable
+ * tiles.
  */
 public class GameFactory {
+    private static final int MAP_SIZE = 15;
+    private static final int FRAGMENT_COUNT = 6;
+    private static final int MEDKIT_COUNT = 4;
+    private static final int DRONE_COUNT = 4;
+
+    private final MazeLoader mazeLoader = new MazeLoader();
+    private final Random random = new Random();
 
     /**
-     * Lightweight container that represents a minimal world used by the engine.
-     * - player: rectangle representing player position + size
-     * - obstacles: simple rectangular collision geometry
-     * - width/height: world bounds (for potential clamping)
+     * Complete world state the engine mutates.
      */
     public static class World {
-        public static final int MAP_SIZE = 10;
+        public static final int MAP_SIZE = GameFactory.MAP_SIZE;
 
         public final int[][] baseMap = new int[MAP_SIZE][MAP_SIZE];
         public final int[][] map = new int[MAP_SIZE][MAP_SIZE];
@@ -51,82 +58,140 @@ public class GameFactory {
         }
     }
 
-    /**
-     * Create a small default world for development and testing.
-     * Replace with map loading or procedural generation later.
-     */
     public World createDefaultWorld() {
         World world = new World();
 
-        for (int y = 0; y < World.MAP_SIZE; y++) {
-            for (int x = 0; x < World.MAP_SIZE; x++) {
-                if (x == 0 || y == 0 || x == World.MAP_SIZE - 1 || y == World.MAP_SIZE - 1) {
-                    world.baseMap[y][x] = MapVisuals.WALL;
-                } else {
-                    world.baseMap[y][x] = MapVisuals.EMPTY;
-                }
-            }
-        }
+        char[][] layout = mazeLoader.loadRandomMaze();
+        List<Position> openTiles = new ArrayList<>();
+        List<Position> roomTiles = new ArrayList<>();
+        applyLayout(world, layout, openTiles, roomTiles);
 
-        world.baseMap[4][6] = MapVisuals.WALL;
-        world.baseMap[4][5] = MapVisuals.WALL;
-        world.baseMap[4][4] = MapVisuals.WALL;
-        world.baseMap[5][4] = MapVisuals.WALL;
-        world.baseMap[6][4] = MapVisuals.WALL;
-        world.baseMap[6][5] = MapVisuals.WALL;
-        world.baseMap[6][6] = MapVisuals.WALL;
-
-        world.baseMap[2][8] = MapVisuals.FRAGMENT;
-        world.baseMap[1][5] = MapVisuals.FRAGMENT;
-        world.baseMap[1][7] = MapVisuals.FRAGMENT;
-        world.baseMap[2][7] = MapVisuals.FRAGMENT;
-        world.baseMap[5][8] = MapVisuals.FRAGMENT;
-        world.baseMap[7][6] = MapVisuals.FRAGMENT;
-
-        world.baseMap[2][1] = MapVisuals.MEDKIT;
-        world.baseMap[2][3] = MapVisuals.MEDKIT;
-        world.baseMap[7][3] = MapVisuals.MEDKIT;
-        world.baseMap[7][2] = MapVisuals.MEDKIT;
-        world.baseMap[4][2] = MapVisuals.MEDKIT;
-
-        world.baseMap[3][3] = MapVisuals.DRONE;
-        world.baseMap[3][4] = MapVisuals.DRONE;
-        world.baseMap[3][5] = MapVisuals.DRONE;
-
-        world.baseMap[1][1] = MapVisuals.EXIT;
-        world.baseMap[8][8] = MapVisuals.DANGER;
-
-        world.player = new Player(new Position(5, 5));
-        world.startTimeMillis = System.currentTimeMillis();
-
-        spawnDronesFromBaseMap(world);
-        world.totalFragmentsRequired = countOnMap(world.baseMap, MapVisuals.FRAGMENT);
-
+        configureWorld(world, openTiles, roomTiles);
         refreshDynamicMap(world);
         return world;
     }
 
-    private static void spawnDronesFromBaseMap(World world) {
-        world.drones.clear();
-        for (int y = 0; y < World.MAP_SIZE; y++) {
-            for (int x = 0; x < World.MAP_SIZE; x++) {
-                if (world.baseMap[y][x] == MapVisuals.DRONE) {
-                    world.drones.add(new Drone(new Position(x, y)));
-                    world.baseMap[y][x] = MapVisuals.EMPTY;
+    private void applyLayout(World world, char[][] layout, List<Position> openTiles, List<Position> roomTiles) {
+        for (int y = 0; y < MAP_SIZE; y++) {
+            for (int x = 0; x < MAP_SIZE; x++) {
+                boolean edge = (x == 0 || y == 0 || x == MAP_SIZE - 1 || y == MAP_SIZE - 1);
+                boolean wall = edge;
+                if (!edge) {
+                    char value = layout[y][x];
+                    wall = (value == '#');
+                    if (!wall) {
+                        Position pos = new Position(x, y);
+                        openTiles.add(pos);
+                        if (value == 'R') {
+                            roomTiles.add(pos);
+                        }
+                    }
                 }
+                world.baseMap[y][x] = wall ? MapVisuals.WALL : MapVisuals.EMPTY;
             }
         }
     }
 
-    private static int countOnMap(int[][] map, int target) {
-        int count = 0;
-        for (int y = 0; y < World.MAP_SIZE; y++) {
-            for (int x = 0; x < World.MAP_SIZE; x++) {
-                if (map[y][x] == target)
-                    count++;
+    private void configureWorld(World world, List<Position> openTiles, List<Position> roomTiles) {
+        if (openTiles.isEmpty()) {
+            throw new IllegalStateException("Maze does not contain any playable tiles.");
+        }
+
+        Position start = chooseStart(roomTiles, openTiles);
+        world.player = new Player(new Position(start.getX(), start.getY()));
+        removePosition(openTiles, start);
+        removePosition(roomTiles, start);
+
+        Position exit = chooseFarthest(openTiles, start);
+        if (exit != null) {
+            world.baseMap[exit.getY()][exit.getX()] = MapVisuals.EXIT;
+            removePosition(openTiles, exit);
+        }
+
+        Position hazard = chooseFarthest(openTiles, start);
+        if (hazard != null) {
+            world.baseMap[hazard.getY()][hazard.getX()] = MapVisuals.DANGER;
+            removePosition(openTiles, hazard);
+        }
+
+        List<Position> placementPool = new ArrayList<>(openTiles);
+        Collections.shuffle(placementPool, random);
+
+        int fragmentsPlaced = placeTiles(placementPool, world.baseMap, MapVisuals.FRAGMENT, FRAGMENT_COUNT);
+        placeTiles(placementPool, world.baseMap, MapVisuals.MEDKIT, MEDKIT_COUNT);
+        spawnDrones(world, placementPool, DRONE_COUNT);
+
+        world.totalFragmentsRequired = fragmentsPlaced;
+        world.startTimeMillis = System.currentTimeMillis();
+    }
+
+    private Position chooseStart(List<Position> roomTiles, List<Position> fallback) {
+        if (!roomTiles.isEmpty()) {
+            return copy(findClosestToCenter(roomTiles));
+        }
+        return copy(findClosestToCenter(fallback));
+    }
+
+    private Position chooseFarthest(List<Position> candidates, Position reference) {
+        if (candidates.isEmpty() || reference == null) {
+            return null;
+        }
+        Position farthest = candidates.get(0);
+        int bestDistance = -1;
+        for (Position pos : candidates) {
+            int dist = distanceSquared(pos, reference);
+            if (dist > bestDistance) {
+                bestDistance = dist;
+                farthest = pos;
             }
         }
-        return count;
+        return copy(farthest);
+    }
+
+    private Position findClosestToCenter(List<Position> candidates) {
+        int center = MAP_SIZE / 2;
+        return Collections.min(candidates, Comparator.comparingInt(p -> distanceSquared(p, center, center)));
+    }
+
+    private Position copy(Position original) {
+        return new Position(original.getX(), original.getY());
+    }
+
+    private void removePosition(List<Position> positions, Position target) {
+        positions.removeIf(p -> p.getX() == target.getX() && p.getY() == target.getY());
+    }
+
+    private int placeTiles(List<Position> pool, int[][] baseMap, int tileValue, int desiredCount) {
+        int placed = 0;
+        for (int i = 0; i < pool.size() && placed < desiredCount; i++) {
+            Position pos = pool.get(i);
+            baseMap[pos.getY()][pos.getX()] = tileValue;
+            placed++;
+            pool.remove(i);
+            i--;
+        }
+        return placed;
+    }
+
+    private void spawnDrones(World world, List<Position> pool, int desiredCount) {
+        int spawned = 0;
+        for (int i = 0; i < pool.size() && spawned < desiredCount; i++) {
+            Position pos = pool.get(i);
+            world.drones.add(new Drone(new Position(pos.getX(), pos.getY())));
+            pool.remove(i);
+            i--;
+            spawned++;
+        }
+    }
+
+    private int distanceSquared(Position pos, Position reference) {
+        return distanceSquared(pos, reference.getX(), reference.getY());
+    }
+
+    private int distanceSquared(Position pos, int targetX, int targetY) {
+        int dx = pos.getX() - targetX;
+        int dy = pos.getY() - targetY;
+        return dx * dx + dy * dy;
     }
 
     public static void refreshDynamicMap(World world) {
