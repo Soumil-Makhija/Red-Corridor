@@ -16,21 +16,20 @@ public final class MapVisuals {
     public static final int DANGER = 6;
     public static final int FRAGMENT = 7;
     public static final int DOOR = 8;
-    // public static final int BLAST_DOOR = 9;
+    public static final int OPEN_DOOR = 9;
+    // public static final int BLAST_DOOR = 10;
 
     // icons path
     private static final String ICON_BASE = "/com/team12/redCorridor/ui/icons/";
     private static final Image WALL_IMAGE = loadImage("wall.png");
     private static final Image PLAYER_IMAGE = loadImage("user.png");
     private static final Image DRONE_IMAGE = loadImage("drone.png");
-    //private static final Image MEDKIT_IMAGE = loadImage("medkit.png");
-    private static final Image MEDKIT_IMAGE = loadImage("close-door.png");
+    private static final Image MEDKIT_IMAGE = loadImage("medkit.png");
     private static final Image EXIT_IMAGE = loadImage("exit.png");
-    private static final Image CLOSED_LOCKER = loadImage("close-door.png");
-    private static final Image OPEN_LOCKER = loadImage("open-door.png");
+    private static final Image CLOSED_DOOR_IMAGE = loadImage("close-door.png");
+    private static final Image OPEN_DOOR_IMAGE = loadImage("open-door.png");
     private static final Image HAZARD_IMAGE = loadImage("hazard.png");
-    //private static final Image FRAGMENT_IMAGE = loadImage("fragment.png");
-    private static final Image FRAGMENT_IMAGE = loadImage("close-door.png");
+    private static final Image FRAGMENT_IMAGE = loadImage("fragment.png");
 
     private MapVisuals() {
     }
@@ -94,7 +93,8 @@ public final class MapVisuals {
             case DRONE -> DRONE_IMAGE;
             case MEDKIT -> MEDKIT_IMAGE;
             case EXIT -> EXIT_IMAGE;
-            // case EXIT, DOOR, BLAST_DOOR -> DOOR_IMAGE;
+            case DOOR -> CLOSED_DOOR_IMAGE;
+            case OPEN_DOOR -> OPEN_DOOR_IMAGE;
             case DANGER -> HAZARD_IMAGE;
             case FRAGMENT -> FRAGMENT_IMAGE;
             default -> null;
@@ -109,5 +109,27 @@ public final class MapVisuals {
             return null;
         }
         return new Image(url.toExternalForm(), false);
+    }
+
+    // Public helper to get icon for UI display
+    public static Image getIconForTileType(int tileType) {
+        return iconFor(tileType);
+    }
+
+    // Public helper to get name for tile type
+    public static String getNameForTileType(int tileType) {
+        return switch (tileType) {
+            case EMPTY -> "Empty";
+            case WALL -> "Wall";
+            case PLAYER -> "Player";
+            case DRONE -> "Drone";
+            case MEDKIT -> "Medkit";
+            case EXIT -> "Exit";
+            case DOOR -> "Door";
+            case OPEN_DOOR -> "Open Door";
+            case DANGER -> "Radiation Hazard";
+            case FRAGMENT -> "Key Fragment";
+            default -> "Unknown";
+        };
     }
 }

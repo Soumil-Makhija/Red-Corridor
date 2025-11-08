@@ -188,12 +188,35 @@ public class GameEngine implements Runnable {
         player.getPosition().setY(ny);
 
         // Interact with tile after moving
-        String interactionMessage = switch (tile) {
-            case MapVisuals.FRAGMENT -> collectFragmentAt(nx, ny);
-            case MapVisuals.MEDKIT -> applyMedkitAt(nx, ny);
-            case MapVisuals.DANGER -> triggerHazardAt(nx, ny);
-            default -> null;
-        };
+        String interactionMessage = null;
+
+        // Check if this is a closed door - reveal and interact with hidden item
+        if (tile == MapVisuals.DOOR) {
+            int hiddenItem = world.hiddenItems[ny][nx];
+            if (hiddenItem != MapVisuals.EMPTY) {
+                // Reveal the actual item
+                world.baseMap[ny][nx] = hiddenItem;
+                interactionMessage = switch (hiddenItem) {
+                    case MapVisuals.FRAGMENT -> collectFragmentAt(nx, ny);
+                    case MapVisuals.MEDKIT -> applyMedkitAt(nx, ny);
+                    case MapVisuals.DANGER -> triggerHazardAt(nx, ny);
+                    default -> "Door opened.";
+                };
+            } else {
+                // Empty door
+                world.baseMap[ny][nx] = MapVisuals.OPEN_DOOR;
+                interactionMessage = "Door opened.";
+            }
+        } else {
+            // Normal tile interaction
+            interactionMessage = switch (tile) {
+                case MapVisuals.FRAGMENT -> collectFragmentAt(nx, ny);
+                case MapVisuals.MEDKIT -> applyMedkitAt(nx, ny);
+                case MapVisuals.DANGER -> triggerHazardAt(nx, ny);
+                default -> null;
+            };
+        }
+
         if (interactionMessage != null) {
             setMessage(interactionMessage);
         }
@@ -212,7 +235,7 @@ public class GameEngine implements Runnable {
         KeyFragment fragment = new KeyFragment(new Position(x, y));
         fragment.collect();
         world.player.addFragment(fragment);
-        world.baseMap[y][x] = MapVisuals.EMPTY;
+        world.baseMap[y][x] = MapVisuals.OPEN_DOOR; // Show open door after collecting
         return "Fragment collected.";
     }
 
@@ -220,13 +243,13 @@ public class GameEngine implements Runnable {
         Medkit medkit = new Medkit(new Position(x, y));
         world.player.addMedkit();
         world.player.heal(medkit.getHealAmount());
-        world.baseMap[y][x] = MapVisuals.EMPTY;
+        world.baseMap[y][x] = MapVisuals.OPEN_DOOR; // Show open door after collecting
         return "Medkit restored +" + medkit.getHealAmount() + " HP.";
     }
 
     private String triggerHazardAt(int x, int y) {
         world.hazardsTriggeredCount++;
-        world.baseMap[y][x] = MapVisuals.EMPTY;
+        world.baseMap[y][x] = MapVisuals.OPEN_DOOR; // Show open door after triggering hazard
         world.player.takeDamage(80);
         return "Hazard triggered! -80 HP.";
     }

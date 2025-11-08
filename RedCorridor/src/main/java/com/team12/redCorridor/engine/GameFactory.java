@@ -33,6 +33,7 @@ public class GameFactory {
 
         public final int[][] baseMap = new int[MAP_SIZE][MAP_SIZE];
         public final int[][] map = new int[MAP_SIZE][MAP_SIZE];
+        public final int[][] hiddenItems = new int[MAP_SIZE][MAP_SIZE]; // Track what's behind doors
         public final List<Drone> drones = new ArrayList<>();
         public Player player;
 
@@ -112,15 +113,17 @@ public class GameFactory {
 
         Position hazard = chooseFarthest(openTiles, start);
         if (hazard != null) {
-            world.baseMap[hazard.getY()][hazard.getX()] = MapVisuals.DANGER;
+            world.hiddenItems[hazard.getY()][hazard.getX()] = MapVisuals.DANGER;
+            world.baseMap[hazard.getY()][hazard.getX()] = MapVisuals.DOOR; // Show as closed door initially
             removePosition(openTiles, hazard);
         }
 
         List<Position> placementPool = new ArrayList<>(openTiles);
         Collections.shuffle(placementPool, random);
 
-        int fragmentsPlaced = placeTiles(placementPool, world.baseMap, MapVisuals.FRAGMENT, FRAGMENT_COUNT);
-        placeTiles(placementPool, world.baseMap, MapVisuals.MEDKIT, MEDKIT_COUNT);
+        int fragmentsPlaced = placeHiddenTiles(placementPool, world.baseMap, world.hiddenItems, MapVisuals.FRAGMENT,
+                FRAGMENT_COUNT);
+        placeHiddenTiles(placementPool, world.baseMap, world.hiddenItems, MapVisuals.MEDKIT, MEDKIT_COUNT);
         spawnDrones(world, placementPool, DRONE_COUNT);
 
         world.totalFragmentsRequired = fragmentsPlaced;
@@ -168,6 +171,20 @@ public class GameFactory {
         for (int i = 0; i < pool.size() && placed < desiredCount; i++) {
             Position pos = pool.get(i);
             baseMap[pos.getY()][pos.getX()] = tileValue;
+            placed++;
+            pool.remove(i);
+            i--;
+        }
+        return placed;
+    }
+
+    private int placeHiddenTiles(List<Position> pool, int[][] baseMap, int[][] hiddenItems, int itemType,
+            int desiredCount) {
+        int placed = 0;
+        for (int i = 0; i < pool.size() && placed < desiredCount; i++) {
+            Position pos = pool.get(i);
+            hiddenItems[pos.getY()][pos.getX()] = itemType; // Store actual item
+            baseMap[pos.getY()][pos.getX()] = MapVisuals.DOOR; // Show closed door
             placed++;
             pool.remove(i);
             i--;
