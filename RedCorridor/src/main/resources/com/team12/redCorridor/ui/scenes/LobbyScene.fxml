@@ -29,9 +29,9 @@
    <center>
       <StackPane alignment="TOP_CENTER" BorderPane.alignment="CENTER">
          <children>
-            <Label text="Game explaination" wrapText="true">
+            <Label prefWidth="520.0" text="You are a captured pilot aboard an enemy cruiser after a sabotage mission gone wrong.&#10;Your only hope of escape lies in piecing together the fragments of the enemy crew's access keys hidden throughout the ship.&#10;Stay alert for the drones and traps they left behind and move quickly.&#10;Once you reassemble the key, you can unlock the hangar bay and make a run for your ship!" textAlignment="CENTER" wrapText="true">
                <font>
-                  <Font size="28.0" />
+                  <Font size="18.0" />
                </font>
             </Label>
          </children>

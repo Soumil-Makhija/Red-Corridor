@@ -24,8 +24,7 @@ public final class MapVisuals {
     private static final Image PLAYER_IMAGE = loadImage("user.png");
     private static final Image DRONE_IMAGE = loadImage("drone.png");
     private static final Image MEDKIT_IMAGE = loadImage("medkit.png");
-    private static final Image OPEN_DOOR_IMAGE = loadImage("open-door.png");
-    private static final Image CLOSE_DOOR_IMAGE = loadImage("close-door.png");
+    private static final Image EXIT_IMAGE = loadImage("exit.png");
     private static final Image HAZARD_IMAGE = loadImage("hazard.png");
     private static final Image FRAGMENT_IMAGE = loadImage("fragment.png");
 
@@ -90,7 +89,7 @@ public final class MapVisuals {
             case PLAYER -> PLAYER_IMAGE;
             case DRONE -> DRONE_IMAGE;
             case MEDKIT -> MEDKIT_IMAGE;
-            case EXIT -> OPEN_DOOR_IMAGE;
+            case EXIT -> EXIT_IMAGE;
             // case EXIT, DOOR, BLAST_DOOR -> DOOR_IMAGE;
             case DANGER -> HAZARD_IMAGE;
             case FRAGMENT -> FRAGMENT_IMAGE;
