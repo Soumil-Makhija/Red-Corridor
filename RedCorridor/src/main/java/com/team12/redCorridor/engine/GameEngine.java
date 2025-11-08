@@ -237,7 +237,9 @@ public class GameEngine implements Runnable {
     }
 
     private boolean atExit() {
-        return world.player.getPosition().getX() == 1 && world.player.getPosition().getY() == 1;
+        int x = world.player.getPosition().getX();
+        int y = world.player.getPosition().getY();
+        return world.baseMap[y][x] == MapVisuals.EXIT;
     }
 
     private int moveDronesTowardPlayer() {

@@ -80,6 +80,10 @@ public class GameFactory {
                     char value = layout[y][x];
                     wall = (value == '#');
                     if (!wall) {
+                        if (value == 'E') {
+                            world.baseMap[y][x] = MapVisuals.EXIT;
+                            continue;
+                        }
                         Position pos = new Position(x, y);
                         openTiles.add(pos);
                         if (value == 'R') {
@@ -102,11 +106,8 @@ public class GameFactory {
         removePosition(openTiles, start);
         removePosition(roomTiles, start);
 
-        Position exit = chooseFarthest(openTiles, start);
-        if (exit != null) {
-            world.baseMap[exit.getY()][exit.getX()] = MapVisuals.EXIT;
-            removePosition(openTiles, exit);
-        }
+        // Remove any tiles already marked as exit
+        openTiles.removeIf(pos -> world.baseMap[pos.getY()][pos.getX()] == MapVisuals.EXIT);
 
         Position hazard = chooseFarthest(openTiles, start);
         if (hazard != null) {

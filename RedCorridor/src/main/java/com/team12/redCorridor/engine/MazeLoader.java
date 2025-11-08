@@ -39,6 +39,7 @@ public class MazeLoader {
 
     public char[][] loadRandomMaze() {
         String file = MAZE_FILES[random.nextInt(MAZE_FILES.length)];
+        System.out.println("[MazeLoader] Loading maze: " + file);
         return loadMaze(file);
     }
 
