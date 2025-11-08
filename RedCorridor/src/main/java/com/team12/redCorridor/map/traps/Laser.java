@@ -1,7 +1,7 @@
 package com.team12.redCorridor.map.traps;
 
 import com.team12.redCorridor.entities.Player;
-import com.team12.redCorridor.map.basicParts.Position;
+import com.team12.redCorridor.entities.Position;
 
 public class Laser extends Trap {
     private int damage;

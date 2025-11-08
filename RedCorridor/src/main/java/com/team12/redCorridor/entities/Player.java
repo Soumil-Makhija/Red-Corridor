@@ -30,7 +30,7 @@ public class Player {
     private List<KeyFragment> fragments;
 
     // How many medkits the player currently has
-    private int medkitCount;
+    private static int medkitCount;
 
     // Constructor: sets up the player when the game starts
     public Player(Position startPosition) {
@@ -39,7 +39,7 @@ public class Player {
         this.health = maxHealth;                       // start with full health
         this.speed = Constants.PLAYER_BASE_SPEED;      // base movement speed
         this.fragments = new ArrayList<>();            // empty list for fragments
-        this.medkitCount = 0;                          // start with no medkits
+        medkitCount = 0;                          // start with no medkits
     }
 
     // Moves the player one step in the chosen direction
@@ -71,7 +71,7 @@ public class Player {
     }
 
     // Increases the number of medkits the player has
-    public void addMedkit() {
+    public static void addMedkit() {
         medkitCount++;
     }
 

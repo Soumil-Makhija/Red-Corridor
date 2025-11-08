@@ -1,5 +1,10 @@
 package com.team12.redCorridor.engine;
 
+import com.team12.redCorridor.entities.Drone;
+import com.team12.redCorridor.entities.Position;
+import com.team12.redCorridor.map.basicParts.*;
+import com.team12.redCorridor.map.lockers.*;
+
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,4 +48,34 @@ public class GameFactory {
 
         return world;
     }
+    /**
+     * Public Factory Methods to instantiate objects.
+     */
+    public Drone createDrone(Position position) {
+        Drone newDrone = new Drone(position);
+        return newDrone;
+    }
+    public Wall createWall(Position position) {
+        Wall newWall = new Wall(position);
+        return newWall;
+    }
+    public ExitDoor createExitDoor(Position position, int requiredKeys) {
+        ExitDoor newExitDoor = new ExitDoor(position, requiredKeys);
+        return newExitDoor;
+    }
+    public AlarmNode createAlarmNode(Position position) {
+        AlarmNode newAlarmNode = new AlarmNode(position);
+        return newAlarmNode;
+    }
+    public Locker createLocker(Position position) {
+        Locker newLocker = new Locker(position);
+        return newLocker;
+    }
+    public SecurityLocker createSecurityLocker(Position position) {
+        AlarmNode tempAlarmNode = createAlarmNode(position);
+        SecurityLocker newSecurityLocker = new SecurityLocker(position, tempAlarmNode);
+        return newSecurityLocker;
+    }
+
+
 }

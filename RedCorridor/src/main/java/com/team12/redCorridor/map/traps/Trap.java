@@ -3,6 +3,7 @@ package com.team12.redCorridor.map.traps;
 import com.team12.redCorridor.entities.Drone;
 import com.team12.redCorridor.entities.Player;
 import com.team12.redCorridor.map.basicParts.*;
+import com.team12.redCorridor.entities.Position;
 
 public abstract class Trap extends Location {
     protected boolean isActive = true;
