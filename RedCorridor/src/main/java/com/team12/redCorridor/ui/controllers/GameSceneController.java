@@ -1,17 +1,17 @@
 package com.team12.redCorridor.ui.controllers;
 
-import com.team12.redCorridor.entities.Drone;
-import com.team12.redCorridor.entities.KeyFragment;
-import com.team12.redCorridor.entities.Medkit;
-import com.team12.redCorridor.entities.Player;
-import com.team12.redCorridor.entities.Position;
+import java.io.IOException;
+
+import com.team12.redCorridor.engine.Direction;
+import com.team12.redCorridor.engine.EngineListener;
+import com.team12.redCorridor.engine.GameEngine;
+import com.team12.redCorridor.engine.GameFactory;
+import com.team12.redCorridor.engine.GameSnapshot;
+import com.team12.redCorridor.engine.GameState;
+import com.team12.redCorridor.engine.InputHandler;
 import com.team12.redCorridor.ui.util.MapVisuals;
 import com.team12.redCorridor.utils.Constants;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
+
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
