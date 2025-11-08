@@ -10,5 +10,6 @@ public record GameSnapshot(
     int hp, int medkits,
     int fragmentsCollected, int fragmentsRequired,
     int dronesTriggered, int hazardsTriggered,
-    long elapsedMillis
+    long elapsedMillis,
+    String message
 ) {}

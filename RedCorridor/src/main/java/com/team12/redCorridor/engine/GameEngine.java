@@ -16,6 +16,9 @@ public class GameEngine implements Runnable {
     private final EngineListener listener;
 
     private volatile GameState state = GameState.PLAYING;
+    private static final long MOVE_INTERVAL_NS = 120_000_000L; // ~120ms between steps
+    private long lastMoveTimeNs = 0L;
+    private String lastMessage = "Use WASD/Arrow keys to move.";
 
     public GameEngine(GameFactory.World world, InputHandler input, EngineListener listener) {
         this.world = world;
@@ -57,6 +60,8 @@ public class GameEngine implements Runnable {
     private void update() {
         if (state != GameState.PLAYING) return;
 
+        long now = System.nanoTime();
+
         // 1) Read input
         int dx = 0, dy = 0;
         if (input != null) {
@@ -66,26 +71,39 @@ public class GameEngine implements Runnable {
             if (input.isPressed(Direction.RIGHT)) dx =  1;
         }
 
+        boolean playerMoved = false;
         // 2) Move player (at most one tile per frame)
-        if (dx != 0 || dy != 0) attemptMove(world.player, dx, dy);
+        if ((dx != 0 || dy != 0) && now - lastMoveTimeNs >= MOVE_INTERVAL_NS) {
+            if (attemptMove(world.player, dx, dy)) {
+                lastMoveTimeNs = now;
+                playerMoved = true;
+            }
+        }
 
-        // 3) Move drones + apply damage
-        int dmg = moveDronesTowardPlayer();
-        if (dmg > 0) {
-            world.player.takeDamage(dmg);
-            world.dronesTriggeredCount++;
+        // 3) Move drones + apply damage (only after player moved)
+        if (playerMoved) {
+            int dmg = moveDronesTowardPlayer();
+            if (dmg > 0) {
+                setMessage("Drone caught you! -" + dmg + " HP");
+            }
         }
 
         // 4) Win/Lose checks
+        GameState nextState = null;
         if (world.player.getHealth() <= 0) {
-            setState(GameState.GAME_OVER);
+            nextState = GameState.GAME_OVER;
         } else if (hasCollectedAllFragments() && atExit()) {
-            setState(GameState.WIN);
+            nextState = GameState.WIN;
         }
 
         // 5) Notify UI
         GameFactory.refreshDynamicMap(world);
         if (listener != null) listener.onFrame(buildSnapshot());
+
+        // 6) Emit state change after latest snapshot has been delivered
+        if (nextState != null) {
+            setState(nextState);
+        }
     }
 
     private void setState(GameState s) {
@@ -97,17 +115,25 @@ public class GameEngine implements Runnable {
 
     // -------------------- World logic (migrated from controller) --------------------
 
-    private void attemptMove(Player p, int dx, int dy) {
+    private boolean attemptMove(Player p, int dx, int dy) {
         int nx = p.getPosition().getX() + dx;
         int ny = p.getPosition().getY() + dy;
-        if (!isWithinBounds(nx, ny) || !isWalkable(nx, ny)) return;
+        if (!isWithinBounds(nx, ny)) {
+            setMessage("Can't move outside the map.");
+            return false;
+        }
+        if (!isWalkable(nx, ny)) {
+            setMessage("Blocked by a wall.");
+            return false;
+        }
 
         int tile = world.baseMap[ny][nx];
 
-        if (tile == MapVisuals.WALL) return;
+        if (tile == MapVisuals.WALL) return false;
         if (tile == MapVisuals.EXIT && !hasCollectedAllFragments()) {
             // locked, do not move
-            return;
+            setMessage("Exit locked. Collect all fragments to unlock.");
+            return false;
         }
 
         // Move
@@ -115,12 +141,16 @@ public class GameEngine implements Runnable {
         p.getPosition().setY(ny);
 
         // Interact with tile after moving
-        switch (tile) {
+        String interactionMessage = switch (tile) {
             case MapVisuals.FRAGMENT -> collectFragmentAt(nx, ny);
             case MapVisuals.MEDKIT   -> applyMedkitAt(nx, ny);
             case MapVisuals.DANGER   -> triggerHazardAt(nx, ny);
-            default -> { /* empty */ }
+            default -> null;
+        };
+        if (interactionMessage != null) {
+            setMessage(interactionMessage);
         }
+        return true;
     }
 
     private boolean isWithinBounds(int x, int y) {
@@ -131,24 +161,27 @@ public class GameEngine implements Runnable {
         return world.baseMap[y][x] != MapVisuals.WALL;
     }
 
-    private void collectFragmentAt(int x, int y) {
+    private String collectFragmentAt(int x, int y) {
         KeyFragment f = new KeyFragment(new Position(x, y));
         f.collect();
         world.player.addFragment(f);
         world.baseMap[y][x] = MapVisuals.EMPTY;
+        return "Fragment collected.";
     }
 
-    private void applyMedkitAt(int x, int y) {
+    private String applyMedkitAt(int x, int y) {
         Medkit m = new Medkit(new Position(x, y));
         world.player.addMedkit();
         world.player.heal(m.getHealAmount());
         world.baseMap[y][x] = MapVisuals.EMPTY;
+        return "Medkit restored +" + m.getHealAmount() + " HP.";
     }
 
-    private void triggerHazardAt(int x, int y) {
+    private String triggerHazardAt(int x, int y) {
         world.hazardsTriggeredCount++;
         world.baseMap[y][x] = MapVisuals.EMPTY;
         world.player.takeDamage(80); // same as HAZARD_DAMAGE in controller
+        return "Hazard triggered! -80 HP.";
     }
 
     private boolean hasCollectedAllFragments() {
@@ -180,6 +213,7 @@ public class GameEngine implements Runnable {
             if (tx == world.player.getPosition().getX() && ty == world.player.getPosition().getY()) {
                 world.player.takeDamage(d.getDamage());
                 d.deactivate();
+                world.dronesTriggeredCount++;
                 totalDamage += d.getDamage();
             }
         }
@@ -205,7 +239,14 @@ public class GameEngine implements Runnable {
             world.totalFragmentsRequired,
             world.dronesTriggeredCount,
             world.hazardsTriggeredCount,
-            world.elapsedMillis()
+            world.elapsedMillis(),
+            lastMessage
         );
+    }
+
+    private void setMessage(String message) {
+        if (message != null && !message.isBlank()) {
+            lastMessage = message;
+        }
     }
 }
