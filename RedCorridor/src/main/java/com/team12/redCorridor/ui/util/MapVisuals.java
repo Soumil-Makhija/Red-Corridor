@@ -23,10 +23,14 @@ public final class MapVisuals {
     private static final Image WALL_IMAGE = loadImage("wall.png");
     private static final Image PLAYER_IMAGE = loadImage("user.png");
     private static final Image DRONE_IMAGE = loadImage("drone.png");
-    private static final Image MEDKIT_IMAGE = loadImage("medkit.png");
+    //private static final Image MEDKIT_IMAGE = loadImage("medkit.png");
+    private static final Image MEDKIT_IMAGE = loadImage("close-door.png");
     private static final Image EXIT_IMAGE = loadImage("exit.png");
+    private static final Image CLOSED_LOCKER = loadImage("close-door.png");
+    private static final Image OPEN_LOCKER = loadImage("open-door.png");
     private static final Image HAZARD_IMAGE = loadImage("hazard.png");
-    private static final Image FRAGMENT_IMAGE = loadImage("fragment.png");
+    //private static final Image FRAGMENT_IMAGE = loadImage("fragment.png");
+    private static final Image FRAGMENT_IMAGE = loadImage("close-door.png");
 
     private MapVisuals() {
     }

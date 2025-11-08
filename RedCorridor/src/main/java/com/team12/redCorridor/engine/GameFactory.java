@@ -63,15 +63,15 @@ public class GameFactory {
 
         char[][] layout = mazeLoader.loadRandomMaze();
         List<Position> openTiles = new ArrayList<>();
-        List<Position> roomTiles = new ArrayList<>();
-        applyLayout(world, layout, openTiles, roomTiles);
+        List<Position> lockerTiles = new ArrayList<>();
+        applyLayout(world, layout, openTiles, lockerTiles);
 
-        configureWorld(world, openTiles, roomTiles);
+        configureWorld(world, openTiles, lockerTiles);
         refreshDynamicMap(world);
         return world;
     }
 
-    private void applyLayout(World world, char[][] layout, List<Position> openTiles, List<Position> roomTiles) {
+    private void applyLayout(World world, char[][] layout, List<Position> openTiles, List<Position> lockerTiles) {
         for (int y = 0; y < MAP_SIZE; y++) {
             for (int x = 0; x < MAP_SIZE; x++) {
                 boolean edge = (x == 0 || y == 0 || x == MAP_SIZE - 1 || y == MAP_SIZE - 1);
@@ -87,7 +87,8 @@ public class GameFactory {
                         Position pos = new Position(x, y);
                         openTiles.add(pos);
                         if (value == 'R') {
-                            roomTiles.add(pos);
+                            world.baseMap[y][x] = MapVisuals.DOOR;
+                            lockerTiles.add(pos);
                         }
                     }
                 }
