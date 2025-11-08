@@ -14,11 +14,15 @@ import com.team12.redCorridor.utils.Constants;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
@@ -42,7 +46,7 @@ public class GameSceneController extends Controller {
     @FXML
     private Label messageLabel;
     @FXML
-    private Label roomItemsLabel;
+    private javafx.scene.layout.VBox roomItemsContainer;
 
     private GameEngine engine;
     private InputHandler input;
@@ -50,6 +54,9 @@ public class GameSceneController extends Controller {
 
     private Canvas canvas;
     private GraphicsContext graphicsContext;
+
+    private int lastPlayerX = -1;
+    private int lastPlayerY = -1;
 
     // get key options from user
     @Override
@@ -151,6 +158,13 @@ public class GameSceneController extends Controller {
             return;
         }
 
+        // Update room items whenever the snapshot changes
+        updateRoomItems(snapshot);
+
+        // Track player position
+        lastPlayerX = snapshot.playerX();
+        lastPlayerY = snapshot.playerY();
+
         if (hpLabel != null) {
             hpLabel.setText("HP: " + snapshot.hp() + "/" + Constants.PLAYER_MAX_HEALTH);
         }
@@ -197,11 +211,58 @@ public class GameSceneController extends Controller {
         if (roomNameLabel != null && (roomNameLabel.getText() == null || roomNameLabel.getText().isBlank())) {
             roomNameLabel.setText("Red Corridor");
         }
-        if (roomItemsLabel != null && (roomItemsLabel.getText() == null || roomItemsLabel.getText().isBlank())) {
-            roomItemsLabel.setText("Track items by exploring the map.");
-        }
         if (messageLabel != null && (messageLabel.getText() == null || messageLabel.getText().isBlank())) {
             messageLabel.setText("Use WASD/Arrow keys to move.");
+        }
+    }
+
+    private void updateRoomItems(GameSnapshot snapshot) {
+        if (roomItemsContainer == null || snapshot == null) {
+            return;
+        }
+
+        roomItemsContainer.getChildren().clear();
+
+        int px = snapshot.playerX();
+        int py = snapshot.playerY();
+        int[][] tiles = snapshot.tiles();
+
+        if (px < 0 || py < 0 || py >= tiles.length || px >= tiles[0].length) {
+            return;
+        }
+
+        int tileType = tiles[py][px];
+
+        // Show items for specific tile types (including items that were just revealed
+        // from doors)
+        if (tileType == MapVisuals.MEDKIT || tileType == MapVisuals.FRAGMENT ||
+                tileType == MapVisuals.DANGER || tileType == MapVisuals.DOOR) {
+
+            HBox itemBox = new HBox(8.0);
+            itemBox.setAlignment(Pos.CENTER_LEFT);
+
+            Image icon = MapVisuals.getIconForTileType(tileType);
+            if (icon != null) {
+                ImageView iconView = new ImageView(icon);
+                iconView.setFitWidth(32);
+                iconView.setFitHeight(32);
+                iconView.setPreserveRatio(true);
+                itemBox.getChildren().add(iconView);
+            }
+
+            Label itemLabel = new Label(MapVisuals.getNameForTileType(tileType));
+            itemBox.getChildren().add(itemLabel);
+
+            roomItemsContainer.getChildren().add(itemBox);
+        } else if (tileType == MapVisuals.OPEN_DOOR) {
+            // Door already opened, show nothing or "Already explored"
+            Label emptyLabel = new Label("Door already opened");
+            emptyLabel.setStyle("-fx-text-fill: gray;");
+            roomItemsContainer.getChildren().add(emptyLabel);
+        } else {
+            Label emptyLabel = new Label("No items here");
+            emptyLabel.setStyle("-fx-text-fill: gray;");
+            roomItemsContainer.getChildren().add(emptyLabel);
         }
     }
 
