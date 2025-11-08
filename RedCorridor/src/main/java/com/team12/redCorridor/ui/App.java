@@ -22,7 +22,8 @@ public class App extends Application {
     public void start(Stage stage) throws Exception {
         try {
             // starts at lobby scene
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("scenes/LobbyScene.fxml"));
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/team12/redCorridor/ui/scenes/LobbyScene.fxml"));
             Parent root = loader.load();
             stage.setTitle("RedCorridor");
             Scene scene = new Scene(root);
