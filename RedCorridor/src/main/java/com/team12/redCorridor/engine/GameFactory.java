@@ -20,7 +20,7 @@ public class GameFactory {
     private static final int MAP_SIZE = 15;
     private static final int FRAGMENT_COUNT = 6;
     private static final int MEDKIT_COUNT = 4;
-    private static final int DRONE_COUNT = 4;
+    private static final int DRONE_COUNT = 6;
 
     private final MazeLoader mazeLoader = new MazeLoader();
     private final Random random = new Random();
@@ -164,18 +164,6 @@ public class GameFactory {
 
     private void removePosition(List<Position> positions, Position target) {
         positions.removeIf(p -> p.getX() == target.getX() && p.getY() == target.getY());
-    }
-
-    private int placeTiles(List<Position> pool, int[][] baseMap, int tileValue, int desiredCount) {
-        int placed = 0;
-        for (int i = 0; i < pool.size() && placed < desiredCount; i++) {
-            Position pos = pool.get(i);
-            baseMap[pos.getY()][pos.getX()] = tileValue;
-            placed++;
-            pool.remove(i);
-            i--;
-        }
-        return placed;
     }
 
     private int placeHiddenTiles(List<Position> pool, int[][] baseMap, int[][] hiddenItems, int itemType,

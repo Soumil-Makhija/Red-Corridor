@@ -1,6 +1,7 @@
 package com.team12.redCorridor.entities;
 
 import com.team12.redCorridor.utils.Constants;
+
 // This class represents a healing item called a Medkit
 public class Medkit {
 

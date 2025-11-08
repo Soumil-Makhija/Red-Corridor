@@ -7,10 +7,10 @@ import com.team12.redCorridor.utils.Constants;
 // This enum lists all possible movement directions
 // for the player. Each value represents one direction they can move in.
 enum Direction {
-    UP,     // Move up (decrease Y)
-    DOWN,   // Move down (increase Y)
-    LEFT,   // Move left (decrease X)
-    RIGHT;  // Move right (increase X)
+    UP, // Move up (decrease Y)
+    DOWN, // Move down (increase Y)
+    LEFT, // Move left (decrease X)
+    RIGHT; // Move right (increase X)
 }
 
 // This class represents the player character in the game
@@ -23,9 +23,6 @@ public class Player {
     private int health;
     private int maxHealth;
 
-    // How fast the player can move
-    private double speed;
-
     // A list to store all collected key fragments
     private List<KeyFragment> fragments;
 
@@ -35,22 +32,22 @@ public class Player {
     // Constructor: sets up the player when the game starts
     public Player(Position startPosition) {
         this.position = startPosition;
-        this.maxHealth = Constants.PLAYER_MAX_HEALTH;  // set from Constants class
-        this.health = maxHealth;                       // start with full health
-        this.speed = Constants.PLAYER_BASE_SPEED;      // base movement speed
-        this.fragments = new ArrayList<>();            // empty list for fragments
-        medkitCount = 0;                          // start with no medkits
+        this.maxHealth = Constants.PLAYER_MAX_HEALTH; // set from Constants class
+        this.health = maxHealth; // start with full health
+        this.fragments = new ArrayList<>(); // empty list for fragments
+        medkitCount = 0; // start with no medkits
     }
 
     // Moves the player one step in the chosen direction
     public void move(Direction dir) {
-        if (dir == null) return; // do nothing if direction not given
+        if (dir == null)
+            return; // do nothing if direction not given
 
         // Move depending on the direction value
         switch (dir) {
-            case UP -> position.setY(position.getY() - 1);    // move up (y decreases)
-            case DOWN -> position.setY(position.getY() + 1);  // move down (y increases)
-            case LEFT -> position.setX(position.getX() - 1);  // move left (x decreases)
+            case UP -> position.setY(position.getY() - 1); // move up (y decreases)
+            case DOWN -> position.setY(position.getY() + 1); // move down (y increases)
+            case LEFT -> position.setX(position.getX() - 1); // move left (x decreases)
             case RIGHT -> position.setX(position.getX() + 1); // move right (x increases)
         }
     }
@@ -71,7 +68,7 @@ public class Player {
     }
 
     // Increases the number of medkits the player has
-    public static void addMedkit() {
+    public void addMedkit() {
         medkitCount++;
     }
 
@@ -84,8 +81,19 @@ public class Player {
     }
 
     // --- Getters (to safely access private values) ---
-    public Position getPosition() { return position; }
-    public int getHealth() { return health; }
-    public int getFragmentCount() { return fragments.size(); }
-    public int getMedkitCount() { return medkitCount; }
+    public Position getPosition() {
+        return position;
+    }
+
+    public int getHealth() {
+        return health;
+    }
+
+    public int getFragmentCount() {
+        return fragments.size();
+    }
+
+    public int getMedkitCount() {
+        return medkitCount;
+    }
 }

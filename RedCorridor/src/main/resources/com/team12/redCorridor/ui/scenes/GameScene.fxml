@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="600.0" prefWidth="830.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.team12.redCorridor.ui.controllers.GameSceneController">
+<BorderPane prefHeight="700.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.team12.redCorridor.ui.controllers.GameSceneController">
    <top>
       <VBox spacing="8.0" BorderPane.alignment="CENTER">
          <children>
@@ -67,7 +67,7 @@
                   <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
             </padding>
             </StackPane>
-            <VBox prefWidth="240.0" spacing="12.0">
+<!--            <VBox prefWidth="240.0" spacing="12.0">
                <children>
                   <Label alignment="CENTER" prefHeight="26.0" prefWidth="318.0" text="Map">
                      <font>
@@ -77,8 +77,8 @@
                   <Separator />
                   <Label fx:id="roomItemsLabel" text="Room Items" wrapText="true" />
                </children>
-            </VBox>
-         </children>
+            </VBox>-->
+        </children>
          <padding>
             <Insets bottom="16.0" left="24.0" right="24.0" top="16.0" />
          </padding>
@@ -90,9 +90,9 @@
             <Separator prefHeight="0.0" prefWidth="830.0" />
             <HBox alignment="CENTER" spacing="24.0">
                <children>
-                  <Label text="[H]elp" />
-                  <Region prefHeight="17.0" prefWidth="625.0" HBox.hgrow="ALWAYS" />
-                  <Label text="[L]obby" />
+                  <Label prefHeight="17.0" prefWidth="49.0" text="[H]elp" />
+                  <Region prefHeight="17.0" prefWidth="471.0" HBox.hgrow="ALWAYS" />
+                  <Label prefHeight="17.0" prefWidth="62.0" text="[L]obby" />
                </children>
                <padding>
                   <Insets bottom="16.0" left="24.0" right="24.0" top="12.0" />
