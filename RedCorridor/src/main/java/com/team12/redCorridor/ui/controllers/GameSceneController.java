@@ -1,16 +1,5 @@
 package com.team12.redCorridor.ui.controllers;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import com.team12.redCorridor.engine.Direction;
-import com.team12.redCorridor.engine.EngineListener;
-import com.team12.redCorridor.engine.GameEngine;
-import com.team12.redCorridor.engine.GameFactory;
-import com.team12.redCorridor.engine.GameSnapshot;
-import com.team12.redCorridor.engine.GameState;
-import com.team12.redCorridor.engine.InputHandler;
 import com.team12.redCorridor.entities.Drone;
 import com.team12.redCorridor.entities.KeyFragment;
 import com.team12.redCorridor.entities.Medkit;
@@ -18,7 +7,9 @@ import com.team12.redCorridor.entities.Player;
 import com.team12.redCorridor.entities.Position;
 import com.team12.redCorridor.ui.util.MapVisuals;
 import com.team12.redCorridor.utils.Constants;
-
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
@@ -56,10 +47,6 @@ public class GameSceneController extends Controller {
     @FXML
     private Label roomItemsLabel;
 
-    private GameEngine engine;
-    private InputHandler input;
-    private GameSnapshot lastSnapshot; //cache for summary scenes
-
     private Canvas canvas;
     private GraphicsContext graphicsContext;
     private final int[][] baseMap = new int[MAP_SIZE][MAP_SIZE]; // static map
@@ -76,75 +63,38 @@ public class GameSceneController extends Controller {
     // get key options from user
     @Override
     public void recordKey(Scene scene) {
-    scene.setOnKeyPressed(event -> {
-        switch (event.getCode()) {
-            case W, UP    -> { if (input != null) input.press(Direction.UP);    }
-            case S, DOWN  -> { if (input != null) input.press(Direction.DOWN);  }
-            case A, LEFT  -> { if (input != null) input.press(Direction.LEFT);  }
-            case D, RIGHT -> { if (input != null) input.press(Direction.RIGHT); }
-            case H -> helpMenu();
-            case L -> lobby();
-            default -> { }
-        }
-    });
-    scene.setOnKeyReleased(event -> {
-        switch (event.getCode()) {
-            case W, UP    -> { if (input != null) input.release(Direction.UP);    }
-            case S, DOWN  -> { if (input != null) input.release(Direction.DOWN);  }
-            case A, LEFT  -> { if (input != null) input.release(Direction.LEFT);  }
-            case D, RIGHT -> { if (input != null) input.release(Direction.RIGHT); }
-            default -> { }
-        }
-    });
-}
+        scene.setOnKeyPressed(event -> {
+            switch (event.getCode()) {
+                case W, UP -> moveUp();
+                case S, DOWN -> moveDown();
+                case A, LEFT -> moveLeft();
+                case D, RIGHT -> moveRight();
+                case H -> helpMenu();
+                case L -> lobby();
+                default -> {
+                }
+            }
+        });
+    }
 
     // init game scene
-@FXML
-public void initialize() {
-    // Build world via factory
-    GameFactory factory = new GameFactory();
-    GameFactory.World world = factory.createDefaultWorld();
+    @FXML
+    public void initialize() {
+        initializeBaseMap(); // init static map
+        initializeWorldState(); // init dynamic map
 
-    // Canvas setup (keep your existing code)
-    canvas = new Canvas(mapPane.getPrefWidth(), mapPane.getPrefHeight());
-    graphicsContext = canvas.getGraphicsContext2D();
-    mapPane.getChildren().add(canvas);
-    mapPane.widthProperty().addListener((obs, o, n) -> resizeCanvas());
-    mapPane.heightProperty().addListener((obs, o, n) -> resizeCanvas());
+        canvas = new Canvas(mapPane.getPrefWidth(), mapPane.getPrefHeight());
+        graphicsContext = canvas.getGraphicsContext2D();
+        mapPane.getChildren().add(canvas);
 
-    // Start engine
-    input = new InputHandler();
-    engine = new GameEngine(world, input, new EngineListener() {
-        @Override public void onFrame(GameSnapshot s) {
-            lastSnapshot = s;
-            javafx.application.Platform.runLater(() -> {
-                // draw tiles from engine
-                MapVisuals.draw(graphicsContext, s.tiles());
-                // HUD
-                hpLabel.setText("HP: " + s.hp() + "/" + com.team12.redCorridor.utils.Constants.PLAYER_MAX_HEALTH);
-                medkitLabel.setText("Medkits: " + s.medkits());
-                String frag = (s.fragmentsRequired() > 0)
-                        ? (s.fragmentsCollected() + "/" + s.fragmentsRequired())
-                        : Integer.toString(s.fragmentsCollected());
-                fragmentsLabel.setText("Fragments: " + frag);
-                timeLabel.setText("Time: " + formatElapsedTime(s.elapsedMillis()));
-                if (roomNameLabel != null && (roomNameLabel.getText() == null || roomNameLabel.getText().isBlank())) {
-                    roomNameLabel.setText("Red Corridor");
-                }
-                if (roomItemsLabel != null && (roomItemsLabel.getText() == null || roomItemsLabel.getText().isBlank())) {
-                    roomItemsLabel.setText("Track items by exploring the map.");
-                }
-            });
-        }
-        @Override public void onStateChange(GameState state) {
-            javafx.application.Platform.runLater(() -> {
-                if (state == GameState.GAME_OVER) showSummaryScene("DefeatScene.fxml");
-                if (state == GameState.WIN)       showSummaryScene("WinScene.fxml");
-            });
-        }
-    });
-    engine.start();
-}
+        mapPane.widthProperty().addListener((obs, oldVal, newVal) -> resizeCanvas());
+        mapPane.heightProperty().addListener((obs, oldVal, newVal) -> resizeCanvas());
+
+        refreshDynamicMap(); // update dynamic objects
+        updateHud("Use WASD/Arrow keys to move."); // init hud message
+        drawMap(); // display icons
+        startTimer();
+    }
 
     // add dynamic objects to map (currently hardcoded)
     private void initializeWorldState() {
@@ -414,39 +364,30 @@ public void initialize() {
 
     // switch to win/defeat scene
     private void showSummaryScene(String resource) {
-    if (engine != null) engine.stop();
-
-    Stage currentStage = stage != null ? stage : getPrimaryStage();
-    if (currentStage == null) return;
-
-    try {
-        FXMLLoader loader = new FXMLLoader(
-            getClass().getResource("/com/team12/redCorridor/ui/scenes/" + resource));
-        Parent root = loader.load();
-        SummarySceneController summaryController = loader.getController();
-        Scene summaryScene = new Scene(root);
-
-        summaryController.setStage(currentStage);
-        summaryController.recordKey(summaryScene);
-
-        if (lastSnapshot != null) {
-            summaryController.setMapData(lastSnapshot.tiles());
-            summaryController.setStats(new SummaryStats(
-                lastSnapshot.fragmentsCollected(),
-                lastSnapshot.fragmentsRequired(),
-                lastSnapshot.dronesTriggered(),
-                lastSnapshot.hazardsTriggered(),
-                lastSnapshot.elapsedMillis(),
-                lastSnapshot.hp()
-            ));
+        stopTimer();
+        Stage currentStage = stage != null ? stage : getPrimaryStage();
+        if (currentStage == null) {
+            return;
         }
 
-        currentStage.setScene(summaryScene);
-        currentStage.show();
-    } catch (IOException e) {
-        e.printStackTrace();
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/team12/redCorridor/ui/scenes/" + resource));
+            Parent root = loader.load();
+            SummarySceneController summaryController = loader.getController();
+            Scene summaryScene = new Scene(root);
+
+            summaryController.setStage(currentStage);
+            summaryController.recordKey(summaryScene);
+            summaryController.setMapData(copyMapData());
+            summaryController.setStats(buildSummaryStats());
+
+            currentStage.setScene(summaryScene);
+            currentStage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-}
 
     private int[][] copyMapData() {
         refreshDynamicMap();
@@ -551,17 +492,5 @@ public void initialize() {
         long minutes = totalSeconds / 60;
         long seconds = totalSeconds % 60;
         return String.format("%02d:%02d", minutes, seconds);
-    }
-
-@Override
-public void lobby() {
-    if (engine != null) engine.stop();   // stop engine when returning to lobby
-    super.lobby();                       // call parent method
-}
-
-@Override
-public void quit(javafx.scene.input.KeyEvent event) {
-    if (engine != null) engine.stop();   // stop engine when quitting the program
-    super.quit(event);                   // call parent quit logic
     }
 }
