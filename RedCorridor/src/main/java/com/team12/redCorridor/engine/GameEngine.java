@@ -178,6 +178,7 @@ public class GameEngine implements Runnable {
     private boolean attemptMove(Player player, int dx, int dy) {
         int prevX = player.getPosition().getX();
         int prevY = player.getPosition().getY();
+        // new temp position
         int nx = prevX + dx;
         int ny = prevY + dy;
 
@@ -271,19 +272,25 @@ public class GameEngine implements Runnable {
         KeyFragment fragment = new KeyFragment(new Position(x, y));
         fragment.collect();
         world.player.addFragment(fragment);
-        world.baseMap[y][x] = MapVisuals.OPEN_DOOR; // Show open door after collecting
+        world.hiddenItems[y][x] = MapVisuals.EMPTY;
+        world.revealedItems[y][x] = MapVisuals.FRAGMENT;
+        world.baseMap[y][x] = MapVisuals.OPEN_DOOR; // Walkable after collecting
         return "Fragment collected.";
     }
 
     private String collectMedkitAt(int x, int y) {
         world.player.addMedkit();
-        world.baseMap[y][x] = MapVisuals.OPEN_DOOR; // Show open door after collecting
+        world.hiddenItems[y][x] = MapVisuals.EMPTY;
+        world.revealedItems[y][x] = MapVisuals.MEDKIT;
+        world.baseMap[y][x] = MapVisuals.OPEN_DOOR; // Walkable after collecting
         return "Medkit secured. Press E to use.";
     }
 
     private String triggerTrapAt(int x, int y) {
         world.trapsTriggeredCount++;
-        world.baseMap[y][x] = MapVisuals.OPEN_DOOR; // Show open door after triggering trap
+        world.hiddenItems[y][x] = MapVisuals.EMPTY;
+        world.revealedItems[y][x] = MapVisuals.TRAP;
+        world.baseMap[y][x] = MapVisuals.OPEN_DOOR; // Walkable after triggering trap
         Trap trap = new Trap(new Position(x, y));
         world.player.takeDamage(trap.getDamage());
         return "Trap triggered! -" + trap.getDamage() + " HP.";
@@ -300,6 +307,7 @@ public class GameEngine implements Runnable {
     private String triggerDroneSpawnAt(int doorX, int doorY) {
         world.baseMap[doorY][doorX] = MapVisuals.OPEN_DOOR;
         world.hiddenItems[doorY][doorX] = MapVisuals.EMPTY;
+        world.revealedItems[doorY][doorX] = MapVisuals.EMPTY;
         Position spawn = findRandomSpawnPosition();
         if (spawn == null) {
             return "Empty room triggered, but no space for a new drone.";

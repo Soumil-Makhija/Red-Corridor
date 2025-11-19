@@ -37,6 +37,7 @@ public class GameFactory {
         public final int[][] baseMap = new int[MAP_SIZE][MAP_SIZE];
         public final int[][] map = new int[MAP_SIZE][MAP_SIZE];
         public final int[][] hiddenItems = new int[MAP_SIZE][MAP_SIZE]; // Track what's behind doors
+        public final int[][] revealedItems = new int[MAP_SIZE][MAP_SIZE]; // Track what was found in rooms
         public final List<Drone> drones = new ArrayList<>();
         public Player player;
 
@@ -171,6 +172,14 @@ public class GameFactory {
     public static void refreshDynamicMap(World world) {
         for (int y = 0; y < World.MAP_SIZE; y++) {
             System.arraycopy(world.baseMap[y], 0, world.map[y], 0, World.MAP_SIZE);
+            for (int x = 0; x < World.MAP_SIZE; x++) {
+                if (world.baseMap[y][x] == MapVisuals.OPEN_DOOR) {
+                    int revealed = world.revealedItems[y][x];
+                    if (revealed != MapVisuals.EMPTY) {
+                        world.map[y][x] = revealed;
+                    }
+                }
+            }
         }
 
         for (Drone drone : world.drones) {
