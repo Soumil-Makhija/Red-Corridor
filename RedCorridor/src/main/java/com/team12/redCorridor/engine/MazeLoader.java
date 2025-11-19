@@ -62,7 +62,8 @@ public class MazeLoader {
                     }
                     if (line.length() < MAZE_SIZE) {
                         throw new IllegalStateException(
-                                "Row " + row + " in maze " + fileName + " is shorter than " + MAZE_SIZE + " characters.");
+                                "Row " + row + " in maze " + fileName + " is shorter than " + MAZE_SIZE
+                                        + " characters.");
                     }
                     for (int col = 0; col < MAZE_SIZE; col++) {
                         grid[row][col] = line.charAt(col);

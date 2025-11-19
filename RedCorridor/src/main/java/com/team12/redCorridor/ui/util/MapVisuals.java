@@ -18,7 +18,6 @@ public final class MapVisuals {
     public static final int DOOR = 8;
     public static final int OPEN_DOOR = 9;
     public static final int DRONE_TRIGGER = 10;
-    // public static final int BLAST_DOOR = 10;
 
     // icons path
     private static final String ICON_BASE = "/com/team12/redCorridor/ui/icons/";

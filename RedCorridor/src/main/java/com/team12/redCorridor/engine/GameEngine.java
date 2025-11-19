@@ -9,6 +9,7 @@ import com.team12.redCorridor.entities.KeyFragment;
 import com.team12.redCorridor.entities.Player;
 import com.team12.redCorridor.entities.Position;
 import com.team12.redCorridor.entities.Trap;
+import com.team12.redCorridor.utils.Constants;
 import com.team12.redCorridor.ui.util.MapVisuals;
 
 /**
@@ -18,11 +19,10 @@ import com.team12.redCorridor.ui.util.MapVisuals;
  * - stop(): requests shutdown and waits for the thread to finish
  * - run(): main loop that calls update() and render() at the target FPS
  */
-
 public class GameEngine implements Runnable {
     private static final long MOVE_INTERVAL_NS = 120_000_000L; // ~120 ms between steps
 
-    private final GameFactory.World world;
+    private final World world;
     private final InputHandler input;
     private final EngineListener listener;
 
@@ -36,7 +36,7 @@ public class GameEngine implements Runnable {
     private String lastMessage = "Use WASD/Arrow keys to move.";
     private final Random random = new Random();
 
-    public GameEngine(GameFactory.World world, InputHandler input, EngineListener listener) {
+    public GameEngine(World world, InputHandler input, EngineListener listener) {
         this.world = world;
         this.input = input;
         this.listener = listener;
@@ -157,7 +157,7 @@ public class GameEngine implements Runnable {
         if (medkitMessage != null) {
             setMessage(medkitMessage);
         }
-        GameFactory.refreshDynamicMap(world);
+        GameFactory.refreshDynamicMap(world); // update new icons
         if (listener != null)
             listener.onFrame(buildSnapshot());
 
@@ -254,6 +254,7 @@ public class GameEngine implements Runnable {
             };
         }
 
+        // display game message
         if (interactionMessage != null) {
             setMessage(interactionMessage);
         }
@@ -261,7 +262,7 @@ public class GameEngine implements Runnable {
     }
 
     private boolean isWithinBounds(int x, int y) {
-        return x >= 0 && x < GameFactory.World.MAP_SIZE && y >= 0 && y < GameFactory.World.MAP_SIZE;
+        return x >= 0 && x < Constants.MAP_SIZE && y >= 0 && y < Constants.MAP_SIZE;
     }
 
     private boolean isWalkable(int x, int y) {
@@ -283,7 +284,7 @@ public class GameEngine implements Runnable {
         world.hiddenItems[y][x] = MapVisuals.EMPTY;
         world.revealedItems[y][x] = MapVisuals.MEDKIT;
         world.baseMap[y][x] = MapVisuals.OPEN_DOOR; // Walkable after collecting
-        return "Medkit secured. Press E to use.";
+        return "A medkit found. Press E to use.";
     }
 
     private String triggerTrapAt(int x, int y) {
@@ -317,18 +318,18 @@ public class GameEngine implements Runnable {
     }
 
     private Position findRandomSpawnPosition() {
-        List<Position> candidates = new ArrayList<>();
-        for (int y = 0; y < GameFactory.World.MAP_SIZE; y++) {
-            for (int x = 0; x < GameFactory.World.MAP_SIZE; x++) {
+        List<Position> possibles = new ArrayList<>();
+        for (int y = 0; y < Constants.MAP_SIZE; y++) {
+            for (int x = 0; x < Constants.MAP_SIZE; x++) {
                 if (canSpawnDroneAt(x, y)) {
-                    candidates.add(new Position(x, y));
+                    possibles.add(new Position(x, y));
                 }
             }
         }
-        if (candidates.isEmpty()) {
+        if (possibles.isEmpty()) {
             return null;
         }
-        return candidates.get(random.nextInt(candidates.size()));
+        return possibles.get(random.nextInt(possibles.size()));
     }
 
     private boolean canSpawnDroneAt(int x, int y) {
@@ -368,6 +369,7 @@ public class GameEngine implements Runnable {
         if (world.drones.isEmpty())
             return 0;
 
+        // deals multiple damage
         int totalDamage = 0;
         for (Drone drone : world.drones) {
             if (!drone.isActive())
@@ -398,9 +400,9 @@ public class GameEngine implements Runnable {
 
     private GameSnapshot buildSnapshot() {
         // tiles
-        int[][] tiles = new int[GameFactory.World.MAP_SIZE][GameFactory.World.MAP_SIZE];
-        for (int y = 0; y < GameFactory.World.MAP_SIZE; y++) {
-            System.arraycopy(world.map[y], 0, tiles[y], 0, GameFactory.World.MAP_SIZE);
+        int[][] tiles = new int[Constants.MAP_SIZE][Constants.MAP_SIZE];
+        for (int y = 0; y < Constants.MAP_SIZE; y++) {
+            System.arraycopy(world.map[y], 0, tiles[y], 0, Constants.MAP_SIZE);
         }
 
         return new GameSnapshot(

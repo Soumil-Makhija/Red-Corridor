@@ -9,6 +9,7 @@ import com.team12.redCorridor.engine.GameFactory;
 import com.team12.redCorridor.engine.GameSnapshot;
 import com.team12.redCorridor.engine.GameState;
 import com.team12.redCorridor.engine.InputHandler;
+import com.team12.redCorridor.engine.World;
 import com.team12.redCorridor.ui.util.MapVisuals;
 import com.team12.redCorridor.utils.Constants;
 
@@ -124,7 +125,7 @@ public class GameSceneController extends Controller {
     }
 
     private void startEngine() {
-        GameFactory.World world = new GameFactory().createDefaultWorld();
+        World world = new GameFactory().createDefaultWorld();
         input = new InputHandler();
         engine = new GameEngine(world, input, new EngineListener() {
             @Override

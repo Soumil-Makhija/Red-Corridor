@@ -10,6 +10,7 @@ import com.team12.redCorridor.entities.Drone;
 import com.team12.redCorridor.entities.Player;
 import com.team12.redCorridor.entities.Position;
 import com.team12.redCorridor.ui.util.MapVisuals;
+import com.team12.redCorridor.utils.Constants;
 
 /**
  * Builds the world by loading one of the authored mazes (15x15 with 13x13
@@ -17,52 +18,10 @@ import com.team12.redCorridor.ui.util.MapVisuals;
  * tiles.
  */
 public class GameFactory {
-    private static final int MAP_SIZE = 15;
-    private static final int FRAGMENT_COUNT = 6;
-    private static final int MEDKIT_COUNT = 6;
-    private static final int TRAP_COUNT = 4;
-    private static final int DRONE_TRIGGER_ROOM_COUNT = 4;
-    private static final int EMPTY_ROOM_COUNT = 4;
-    private static final int DRONE_COUNT = 6;
-
     private final MazeLoader mazeLoader = new MazeLoader();
     private final Random random = new Random();
 
-    /**
-     * Complete world state the engine mutates.
-     */
-    public static class World {
-        public static final int MAP_SIZE = GameFactory.MAP_SIZE;
-
-        public final int[][] baseMap = new int[MAP_SIZE][MAP_SIZE];
-        public final int[][] map = new int[MAP_SIZE][MAP_SIZE];
-        public final int[][] hiddenItems = new int[MAP_SIZE][MAP_SIZE]; // Track what's behind doors
-        public final int[][] revealedItems = new int[MAP_SIZE][MAP_SIZE]; // Track what was found in rooms
-        public final List<Drone> drones = new ArrayList<>();
-        public Player player;
-
-        public int totalFragmentsRequired;
-        public int dronesTriggeredCount;
-        public int trapsTriggeredCount;
-        public long startTimeMillis;
-
-        public int hp() {
-            return player != null ? player.getHealth() : 0;
-        }
-
-        public int medkits() {
-            return player != null ? player.getMedkitCount() : 0;
-        }
-
-        public int fragmentsCollected() {
-            return player != null ? player.getFragmentCount() : 0;
-        }
-
-        public long elapsedMillis() {
-            return startTimeMillis > 0 ? System.currentTimeMillis() - startTimeMillis : 0;
-        }
-    }
-
+    // main world
     public World createDefaultWorld() {
         World world = new World();
 
@@ -76,9 +35,9 @@ public class GameFactory {
     }
 
     private void applyLayout(World world, char[][] layout, List<Position> openTiles) {
-        for (int y = 0; y < MAP_SIZE; y++) {
-            for (int x = 0; x < MAP_SIZE; x++) {
-                boolean edge = (x == 0 || y == 0 || x == MAP_SIZE - 1 || y == MAP_SIZE - 1);
+        for (int y = 0; y < Constants.MAP_SIZE; y++) {
+            for (int x = 0; x < Constants.MAP_SIZE; x++) {
+                boolean edge = (x == 0 || y == 0 || x == Constants.MAP_SIZE - 1 || y == Constants.MAP_SIZE - 1);
                 boolean wall = edge;
                 if (!edge) {
                     char value = layout[y][x];
@@ -113,20 +72,20 @@ public class GameFactory {
         Collections.shuffle(placementPool, random);
 
         int fragmentsPlaced = placeHiddenTiles(placementPool, world.baseMap, world.hiddenItems, MapVisuals.FRAGMENT,
-                FRAGMENT_COUNT);
-        placeHiddenTiles(placementPool, world.baseMap, world.hiddenItems, MapVisuals.MEDKIT, MEDKIT_COUNT);
-        placeHiddenTiles(placementPool, world.baseMap, world.hiddenItems, MapVisuals.TRAP, TRAP_COUNT);
+                Constants.FRAGMENT_COUNT);
+        placeHiddenTiles(placementPool, world.baseMap, world.hiddenItems, MapVisuals.MEDKIT, Constants.MEDKIT_COUNT);
+        placeHiddenTiles(placementPool, world.baseMap, world.hiddenItems, MapVisuals.TRAP, Constants.TRAP_COUNT);
         placeHiddenTiles(placementPool, world.baseMap, world.hiddenItems, MapVisuals.DRONE_TRIGGER,
-                DRONE_TRIGGER_ROOM_COUNT);
-        placeHiddenTiles(placementPool, world.baseMap, world.hiddenItems, MapVisuals.EMPTY, EMPTY_ROOM_COUNT);
-        spawnDrones(world, placementPool, DRONE_COUNT);
+                Constants.DRONE_TRIGGER_ROOM_COUNT);
+        placeHiddenTiles(placementPool, world.baseMap, world.hiddenItems, MapVisuals.EMPTY, Constants.EMPTY_ROOM_COUNT);
+        spawnDrones(world, placementPool, Constants.DRONE_COUNT);
 
         world.totalFragmentsRequired = fragmentsPlaced;
         world.startTimeMillis = System.currentTimeMillis();
     }
 
     private Position findClosestToCenter(List<Position> candidates) {
-        int center = MAP_SIZE / 2;
+        int center = Constants.MAP_SIZE / 2;
         return Collections.min(candidates, Comparator.comparingInt(p -> distanceSquared(p, center, center)));
     }
 
@@ -170,9 +129,9 @@ public class GameFactory {
     }
 
     public static void refreshDynamicMap(World world) {
-        for (int y = 0; y < World.MAP_SIZE; y++) {
-            System.arraycopy(world.baseMap[y], 0, world.map[y], 0, World.MAP_SIZE);
-            for (int x = 0; x < World.MAP_SIZE; x++) {
+        for (int y = 0; y < Constants.MAP_SIZE; y++) {
+            System.arraycopy(world.baseMap[y], 0, world.map[y], 0, Constants.MAP_SIZE);
+            for (int x = 0; x < Constants.MAP_SIZE; x++) {
                 if (world.baseMap[y][x] == MapVisuals.OPEN_DOOR) {
                     int revealed = world.revealedItems[y][x];
                     if (revealed != MapVisuals.EMPTY) {
