@@ -51,6 +51,7 @@
                   <Label alignment="CENTER" prefHeight="17.0" prefWidth="53.0" text="[L]obby" wrapText="true" VBox.vgrow="ALWAYS" />
                   <Label alignment="CENTER" layoutX="213.0" layoutY="41.0" prefHeight="17.0" prefWidth="53.0" text="[B]ack" wrapText="true" />
                   <Label alignment="CENTER" prefHeight="17.0" prefWidth="47.0" text="[Q]uit" wrapText="true" VBox.vgrow="ALWAYS" />
+                  <Label alignment="CENTER" layoutX="216.0" layoutY="91.0" prefHeight="17.0" prefWidth="89.0" text="[E] Apply Med" wrapText="true" />
                </children>
             </VBox>
             <VBox alignment="TOP_CENTER" nodeOrientation="LEFT_TO_RIGHT" spacing="8.0">

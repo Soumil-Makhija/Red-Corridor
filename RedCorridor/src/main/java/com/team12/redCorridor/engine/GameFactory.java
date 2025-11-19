@@ -162,10 +162,6 @@ public class GameFactory {
         }
     }
 
-    private int distanceSquared(Position pos, Position reference) {
-        return distanceSquared(pos, reference.getX(), reference.getY());
-    }
-
     private int distanceSquared(Position pos, int targetX, int targetY) {
         int dx = pos.getX() - targetX;
         int dy = pos.getY() - targetY;

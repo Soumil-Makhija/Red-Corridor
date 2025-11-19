@@ -73,11 +73,14 @@ public class Player {
     }
 
     // Uses a medkit to heal the player (if available)
-    public void useMedkit() {
+    public int useMedkit() {
         if (medkitCount > 0) {
+            int before = health;
             heal(Constants.MEDKIT_HEAL_AMOUNT); // heal by a fixed amount
             medkitCount--; // reduce medkit count by 1
+            return health - before;
         }
+        return 0;
     }
 
     // --- Getters (to safely access private values) ---

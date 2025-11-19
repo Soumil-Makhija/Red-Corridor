@@ -6,7 +6,6 @@ import java.util.Random;
 
 import com.team12.redCorridor.entities.Drone;
 import com.team12.redCorridor.entities.KeyFragment;
-import com.team12.redCorridor.entities.Medkit;
 import com.team12.redCorridor.entities.Player;
 import com.team12.redCorridor.entities.Position;
 import com.team12.redCorridor.entities.Trap;
@@ -19,8 +18,6 @@ import com.team12.redCorridor.ui.util.MapVisuals;
  * - stop(): requests shutdown and waits for the thread to finish
  * - run(): main loop that calls update() and render() at the target FPS
  */
-// Keep this class small and synchronous — move game logic into other engine
-// classes
 
 public class GameEngine implements Runnable {
     private static final long MOVE_INTERVAL_NS = 120_000_000L; // ~120 ms between steps
@@ -143,6 +140,11 @@ public class GameEngine implements Runnable {
             }
         }
 
+        String medkitMessage = null;
+        if (input != null && input.consumeMedkitRequest()) {
+            medkitMessage = useMedkitFromInventory();
+        }
+
         // 4) Win/Lose checks
         GameState nextState = null;
         if (world.player.getHealth() <= 0) {
@@ -152,6 +154,9 @@ public class GameEngine implements Runnable {
         }
 
         // 5) Notify UI
+        if (medkitMessage != null) {
+            setMessage(medkitMessage);
+        }
         GameFactory.refreshDynamicMap(world);
         if (listener != null)
             listener.onFrame(buildSnapshot());
@@ -212,8 +217,7 @@ public class GameEngine implements Runnable {
                     }
                     case MapVisuals.MEDKIT: {
                         world.baseMap[ny][nx] = hiddenItem;
-                        applyMedkitAt(nx, ny);
-                        interactionMessage = "You used a medkit.";
+                        interactionMessage = collectMedkitAt(nx, ny);
                         break;
                     }
                     case MapVisuals.TRAP: {
@@ -242,7 +246,7 @@ public class GameEngine implements Runnable {
             // Normal tile interaction
             interactionMessage = switch (tile) {
                 case MapVisuals.FRAGMENT -> collectFragmentAt(nx, ny);
-                case MapVisuals.MEDKIT -> applyMedkitAt(nx, ny);
+                case MapVisuals.MEDKIT -> collectMedkitAt(nx, ny);
                 case MapVisuals.TRAP -> triggerTrapAt(nx, ny);
                 case MapVisuals.DRONE_TRIGGER -> triggerDroneSpawnAt(nx, ny);
                 default -> null;
@@ -271,12 +275,10 @@ public class GameEngine implements Runnable {
         return "Fragment collected.";
     }
 
-    private String applyMedkitAt(int x, int y) {
-        Medkit medkit = new Medkit(new Position(x, y));
+    private String collectMedkitAt(int x, int y) {
         world.player.addMedkit();
-        world.player.heal(medkit.getHealAmount());
         world.baseMap[y][x] = MapVisuals.OPEN_DOOR; // Show open door after collecting
-        return "Medkit restored +" + medkit.getHealAmount() + " HP.";
+        return "Medkit secured. Press E to use.";
     }
 
     private String triggerTrapAt(int x, int y) {
@@ -285,6 +287,14 @@ public class GameEngine implements Runnable {
         Trap trap = new Trap(new Position(x, y));
         world.player.takeDamage(trap.getDamage());
         return "Trap triggered! -" + trap.getDamage() + " HP.";
+    }
+
+    private String useMedkitFromInventory() {
+        int healed = world.player.useMedkit();
+        if (healed > 0) {
+            return "Medkit used. +" + healed + " HP.";
+        }
+        return "No medkits available.";
     }
 
     private String triggerDroneSpawnAt(int doorX, int doorY) {

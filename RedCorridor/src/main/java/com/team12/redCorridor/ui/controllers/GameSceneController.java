@@ -20,7 +20,6 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 /**
@@ -94,6 +93,10 @@ public class GameSceneController extends Controller {
                 case D, RIGHT -> {
                     if (input != null)
                         input.release(Direction.RIGHT);
+                }
+                case E -> {
+                    if (input != null)
+                        input.requestMedkitUse();
                 }
                 default -> {
                 }
