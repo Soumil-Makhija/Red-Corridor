@@ -19,7 +19,10 @@ import com.team12.redCorridor.ui.util.MapVisuals;
 public class GameFactory {
     private static final int MAP_SIZE = 15;
     private static final int FRAGMENT_COUNT = 6;
-    private static final int MEDKIT_COUNT = 4;
+    private static final int MEDKIT_COUNT = 6;
+    private static final int TRAP_COUNT = 4;
+    private static final int DRONE_TRIGGER_ROOM_COUNT = 4;
+    private static final int EMPTY_ROOM_COUNT = 4;
     private static final int DRONE_COUNT = 6;
 
     private final MazeLoader mazeLoader = new MazeLoader();
@@ -105,39 +108,20 @@ public class GameFactory {
         // Remove any tiles already marked as exit
         openTiles.removeIf(pos -> world.baseMap[pos.getY()][pos.getX()] == MapVisuals.EXIT);
 
-        Position hazard = chooseFarthest(openTiles, start);
-        if (hazard != null) {
-            world.hiddenItems[hazard.getY()][hazard.getX()] = MapVisuals.DANGER;
-            world.baseMap[hazard.getY()][hazard.getX()] = MapVisuals.DOOR; // Show as closed door initially
-            removePosition(openTiles, hazard);
-        }
-
         List<Position> placementPool = new ArrayList<>(openTiles);
         Collections.shuffle(placementPool, random);
 
         int fragmentsPlaced = placeHiddenTiles(placementPool, world.baseMap, world.hiddenItems, MapVisuals.FRAGMENT,
                 FRAGMENT_COUNT);
         placeHiddenTiles(placementPool, world.baseMap, world.hiddenItems, MapVisuals.MEDKIT, MEDKIT_COUNT);
+        placeHiddenTiles(placementPool, world.baseMap, world.hiddenItems, MapVisuals.DANGER, TRAP_COUNT);
+        placeHiddenTiles(placementPool, world.baseMap, world.hiddenItems, MapVisuals.DRONE_TRIGGER,
+                DRONE_TRIGGER_ROOM_COUNT);
+        placeHiddenTiles(placementPool, world.baseMap, world.hiddenItems, MapVisuals.EMPTY, EMPTY_ROOM_COUNT);
         spawnDrones(world, placementPool, DRONE_COUNT);
 
         world.totalFragmentsRequired = fragmentsPlaced;
         world.startTimeMillis = System.currentTimeMillis();
-    }
-
-    private Position chooseFarthest(List<Position> candidates, Position reference) {
-        if (candidates.isEmpty() || reference == null) {
-            return null;
-        }
-        Position farthest = candidates.get(0);
-        int bestDistance = -1;
-        for (Position pos : candidates) {
-            int dist = distanceSquared(pos, reference);
-            if (dist > bestDistance) {
-                bestDistance = dist;
-                farthest = pos;
-            }
-        }
-        return copy(farthest);
     }
 
     private Position findClosestToCenter(List<Position> candidates) {

@@ -17,6 +17,7 @@ public final class MapVisuals {
     public static final int FRAGMENT = 7;
     public static final int DOOR = 8;
     public static final int OPEN_DOOR = 9;
+    public static final int DRONE_TRIGGER = 10;
     // public static final int BLAST_DOOR = 10;
 
     // icons path
@@ -129,6 +130,7 @@ public final class MapVisuals {
             case OPEN_DOOR -> "Open Door";
             case DANGER -> "Radiation Hazard";
             case FRAGMENT -> "Key Fragment";
+            case DRONE_TRIGGER -> "Drone Trigger";
             default -> "Unknown";
         };
     }

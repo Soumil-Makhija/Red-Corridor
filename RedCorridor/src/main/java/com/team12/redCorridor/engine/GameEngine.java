@@ -1,5 +1,9 @@
 package com.team12.redCorridor.engine;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 import com.team12.redCorridor.entities.Drone;
 import com.team12.redCorridor.entities.KeyFragment;
 import com.team12.redCorridor.entities.Medkit;
@@ -32,6 +36,7 @@ public class GameEngine implements Runnable {
 
     private long lastMoveTimeNs = 0L;
     private String lastMessage = "Use WASD/Arrow keys to move.";
+    private final Random random = new Random();
 
     public GameEngine(GameFactory.World world, InputHandler input, EngineListener listener) {
         this.world = world;
@@ -165,8 +170,10 @@ public class GameEngine implements Runnable {
     }
 
     private boolean attemptMove(Player player, int dx, int dy) {
-        int nx = player.getPosition().getX() + dx;
-        int ny = player.getPosition().getY() + dy;
+        int prevX = player.getPosition().getX();
+        int prevY = player.getPosition().getY();
+        int nx = prevX + dx;
+        int ny = prevY + dy;
 
         if (!isWithinBounds(nx, ny)) {
             setMessage("Can't move outside the map.");
@@ -195,13 +202,36 @@ public class GameEngine implements Runnable {
             int hiddenItem = world.hiddenItems[ny][nx];
             if (hiddenItem != MapVisuals.EMPTY) {
                 // Reveal the actual item
-                world.baseMap[ny][nx] = hiddenItem;
-                interactionMessage = switch (hiddenItem) {
-                    case MapVisuals.FRAGMENT -> collectFragmentAt(nx, ny);
-                    case MapVisuals.MEDKIT -> applyMedkitAt(nx, ny);
-                    case MapVisuals.DANGER -> triggerHazardAt(nx, ny);
-                    default -> "Door opened.";
-                };
+                switch (hiddenItem) {
+                    case MapVisuals.FRAGMENT: {
+                        world.baseMap[ny][nx] = hiddenItem;
+                        collectFragmentAt(nx, ny);
+                        interactionMessage = "You found a fragment.";
+                        break;
+                    }
+                    case MapVisuals.MEDKIT: {
+                        world.baseMap[ny][nx] = hiddenItem;
+                        applyMedkitAt(nx, ny);
+                        interactionMessage = "You used a medkit.";
+                        break;
+                    }
+                    case MapVisuals.DANGER: {
+                        world.baseMap[ny][nx] = hiddenItem;
+                        triggerHazardAt(nx, ny);
+                        interactionMessage = "A trap was triggered!";
+                        break;
+                    }
+                    case MapVisuals.DRONE_TRIGGER: {
+                        triggerDroneSpawnAt(nx, ny);
+                        interactionMessage = "A drone has been activated!";
+                        break;
+                    }
+                    default: {
+                        world.baseMap[ny][nx] = MapVisuals.OPEN_DOOR;
+                        interactionMessage = "Door opened.";
+                        break;
+                    }
+                }
             } else {
                 // Empty door
                 world.baseMap[ny][nx] = MapVisuals.OPEN_DOOR;
@@ -213,6 +243,7 @@ public class GameEngine implements Runnable {
                 case MapVisuals.FRAGMENT -> collectFragmentAt(nx, ny);
                 case MapVisuals.MEDKIT -> applyMedkitAt(nx, ny);
                 case MapVisuals.DANGER -> triggerHazardAt(nx, ny);
+                case MapVisuals.DRONE_TRIGGER -> triggerDroneSpawnAt(nx, ny);
                 default -> null;
             };
         }
@@ -252,6 +283,54 @@ public class GameEngine implements Runnable {
         world.baseMap[y][x] = MapVisuals.OPEN_DOOR; // Show open door after triggering hazard
         world.player.takeDamage(80);
         return "Hazard triggered! -80 HP.";
+    }
+
+    private String triggerDroneSpawnAt(int doorX, int doorY) {
+        world.baseMap[doorY][doorX] = MapVisuals.OPEN_DOOR;
+        world.hiddenItems[doorY][doorX] = MapVisuals.EMPTY;
+        Position spawn = findRandomSpawnPosition();
+        if (spawn == null) {
+            return "Empty room triggered, but no space for a new drone.";
+        }
+        world.drones.add(new Drone(spawn));
+        return "Empty room triggered a new drone!";
+    }
+
+    private Position findRandomSpawnPosition() {
+        List<Position> candidates = new ArrayList<>();
+        for (int y = 0; y < GameFactory.World.MAP_SIZE; y++) {
+            for (int x = 0; x < GameFactory.World.MAP_SIZE; x++) {
+                if (canSpawnDroneAt(x, y)) {
+                    candidates.add(new Position(x, y));
+                }
+            }
+        }
+        if (candidates.isEmpty()) {
+            return null;
+        }
+        return candidates.get(random.nextInt(candidates.size()));
+    }
+
+    private boolean canSpawnDroneAt(int x, int y) {
+        if (!isWithinBounds(x, y)) {
+            return false;
+        }
+        int tile = world.baseMap[y][x];
+        if (tile == MapVisuals.WALL || tile == MapVisuals.EXIT || tile == MapVisuals.DOOR) {
+            return false;
+        }
+        if (world.player.getPosition().getX() == x && world.player.getPosition().getY() == y) {
+            return false;
+        }
+        for (Drone drone : world.drones) {
+            if (drone.isActive()) {
+                Position pos = drone.getPosition();
+                if (pos.getX() == x && pos.getY() == y) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     private boolean hasCollectedAllFragments() {
