@@ -225,7 +225,7 @@ public class GameSceneController extends Controller {
                         lastSnapshot.fragmentsCollected(),
                         lastSnapshot.fragmentsRequired(),
                         lastSnapshot.dronesTriggered(),
-                        lastSnapshot.hazardsTriggered(),
+                        lastSnapshot.trapsTriggered(),
                         lastSnapshot.elapsedMillis(),
                         lastSnapshot.hp()));
             }

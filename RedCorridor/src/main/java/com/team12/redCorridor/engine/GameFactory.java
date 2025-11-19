@@ -42,7 +42,7 @@ public class GameFactory {
 
         public int totalFragmentsRequired;
         public int dronesTriggeredCount;
-        public int hazardsTriggeredCount;
+        public int trapsTriggeredCount;
         public long startTimeMillis;
 
         public int hp() {
@@ -114,7 +114,7 @@ public class GameFactory {
         int fragmentsPlaced = placeHiddenTiles(placementPool, world.baseMap, world.hiddenItems, MapVisuals.FRAGMENT,
                 FRAGMENT_COUNT);
         placeHiddenTiles(placementPool, world.baseMap, world.hiddenItems, MapVisuals.MEDKIT, MEDKIT_COUNT);
-        placeHiddenTiles(placementPool, world.baseMap, world.hiddenItems, MapVisuals.DANGER, TRAP_COUNT);
+        placeHiddenTiles(placementPool, world.baseMap, world.hiddenItems, MapVisuals.TRAP, TRAP_COUNT);
         placeHiddenTiles(placementPool, world.baseMap, world.hiddenItems, MapVisuals.DRONE_TRIGGER,
                 DRONE_TRIGGER_ROOM_COUNT);
         placeHiddenTiles(placementPool, world.baseMap, world.hiddenItems, MapVisuals.EMPTY, EMPTY_ROOM_COUNT);

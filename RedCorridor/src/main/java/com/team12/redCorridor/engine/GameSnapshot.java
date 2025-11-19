@@ -9,7 +9,7 @@ public record GameSnapshot(
     int playerX, int playerY,
     int hp, int medkits,
     int fragmentsCollected, int fragmentsRequired,
-    int dronesTriggered, int hazardsTriggered,
+    int dronesTriggered, int trapsTriggered,
     long elapsedMillis,
     String message
 ) {}

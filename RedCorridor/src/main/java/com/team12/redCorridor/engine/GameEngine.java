@@ -9,6 +9,7 @@ import com.team12.redCorridor.entities.KeyFragment;
 import com.team12.redCorridor.entities.Medkit;
 import com.team12.redCorridor.entities.Player;
 import com.team12.redCorridor.entities.Position;
+import com.team12.redCorridor.entities.Trap;
 import com.team12.redCorridor.ui.util.MapVisuals;
 
 /**
@@ -215,9 +216,9 @@ public class GameEngine implements Runnable {
                         interactionMessage = "You used a medkit.";
                         break;
                     }
-                    case MapVisuals.DANGER: {
+                    case MapVisuals.TRAP: {
                         world.baseMap[ny][nx] = hiddenItem;
-                        triggerHazardAt(nx, ny);
+                        triggerTrapAt(nx, ny);
                         interactionMessage = "A trap was triggered!";
                         break;
                     }
@@ -242,7 +243,7 @@ public class GameEngine implements Runnable {
             interactionMessage = switch (tile) {
                 case MapVisuals.FRAGMENT -> collectFragmentAt(nx, ny);
                 case MapVisuals.MEDKIT -> applyMedkitAt(nx, ny);
-                case MapVisuals.DANGER -> triggerHazardAt(nx, ny);
+                case MapVisuals.TRAP -> triggerTrapAt(nx, ny);
                 case MapVisuals.DRONE_TRIGGER -> triggerDroneSpawnAt(nx, ny);
                 default -> null;
             };
@@ -278,11 +279,12 @@ public class GameEngine implements Runnable {
         return "Medkit restored +" + medkit.getHealAmount() + " HP.";
     }
 
-    private String triggerHazardAt(int x, int y) {
-        world.hazardsTriggeredCount++;
-        world.baseMap[y][x] = MapVisuals.OPEN_DOOR; // Show open door after triggering hazard
-        world.player.takeDamage(80);
-        return "Hazard triggered! -80 HP.";
+    private String triggerTrapAt(int x, int y) {
+        world.trapsTriggeredCount++;
+        world.baseMap[y][x] = MapVisuals.OPEN_DOOR; // Show open door after triggering trap
+        Trap trap = new Trap(new Position(x, y));
+        world.player.takeDamage(trap.getDamage());
+        return "Trap triggered! -" + trap.getDamage() + " HP.";
     }
 
     private String triggerDroneSpawnAt(int doorX, int doorY) {
@@ -392,7 +394,7 @@ public class GameEngine implements Runnable {
                 world.fragmentsCollected(),
                 world.totalFragmentsRequired,
                 world.dronesTriggeredCount,
-                world.hazardsTriggeredCount,
+                world.trapsTriggeredCount,
                 world.elapsedMillis(),
                 lastMessage);
     }

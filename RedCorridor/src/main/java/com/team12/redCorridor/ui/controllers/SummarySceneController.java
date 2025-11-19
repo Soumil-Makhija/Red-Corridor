@@ -95,7 +95,7 @@ public abstract class SummarySceneController extends Controller {
             dronesStatLabel.setText("Drones triggered: " + summaryStats.getDronesTriggered());
         }
         if (trapsStatLabel != null) {
-            trapsStatLabel.setText("Hazards triggered: " + summaryStats.getHazardsTriggered());
+            trapsStatLabel.setText("Traps triggered: " + summaryStats.getTrapsTriggered());
         }
         if (timeStatLabel != null) {
             timeStatLabel.setText("Time taken: " + formatElapsedTime(summaryStats.getElapsedMillis()));
