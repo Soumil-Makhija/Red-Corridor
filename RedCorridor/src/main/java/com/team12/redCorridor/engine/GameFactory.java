@@ -64,15 +64,14 @@ public class GameFactory {
 
         char[][] layout = mazeLoader.loadRandomMaze();
         List<Position> openTiles = new ArrayList<>();
-        List<Position> lockerTiles = new ArrayList<>();
-        applyLayout(world, layout, openTiles, lockerTiles);
+        applyLayout(world, layout, openTiles);
 
-        configureWorld(world, openTiles, lockerTiles);
+        configureWorld(world, openTiles);
         refreshDynamicMap(world);
         return world;
     }
 
-    private void applyLayout(World world, char[][] layout, List<Position> openTiles, List<Position> lockerTiles) {
+    private void applyLayout(World world, char[][] layout, List<Position> openTiles) {
         for (int y = 0; y < MAP_SIZE; y++) {
             for (int x = 0; x < MAP_SIZE; x++) {
                 boolean edge = (x == 0 || y == 0 || x == MAP_SIZE - 1 || y == MAP_SIZE - 1);
@@ -87,10 +86,6 @@ public class GameFactory {
                         }
                         Position pos = new Position(x, y);
                         openTiles.add(pos);
-                        if (value == 'R') {
-                            world.baseMap[y][x] = MapVisuals.DOOR;
-                            lockerTiles.add(pos);
-                        }
                     }
                 }
                 world.baseMap[y][x] = wall ? MapVisuals.WALL : MapVisuals.EMPTY;
@@ -98,15 +93,14 @@ public class GameFactory {
         }
     }
 
-    private void configureWorld(World world, List<Position> openTiles, List<Position> roomTiles) {
+    private void configureWorld(World world, List<Position> openTiles) {
         if (openTiles.isEmpty()) {
             throw new IllegalStateException("Maze does not contain any playable tiles.");
         }
 
-        Position start = chooseStart(roomTiles, openTiles);
+        Position start = copy(findClosestToCenter(openTiles));
         world.player = new Player(new Position(start.getX(), start.getY()));
         removePosition(openTiles, start);
-        removePosition(roomTiles, start);
 
         // Remove any tiles already marked as exit
         openTiles.removeIf(pos -> world.baseMap[pos.getY()][pos.getX()] == MapVisuals.EXIT);
@@ -128,13 +122,6 @@ public class GameFactory {
 
         world.totalFragmentsRequired = fragmentsPlaced;
         world.startTimeMillis = System.currentTimeMillis();
-    }
-
-    private Position chooseStart(List<Position> roomTiles, List<Position> fallback) {
-        if (!roomTiles.isEmpty()) {
-            return copy(findClosestToCenter(roomTiles));
-        }
-        return copy(findClosestToCenter(fallback));
     }
 
     private Position chooseFarthest(List<Position> candidates, Position reference) {

@@ -9,7 +9,7 @@ import java.util.Random;
 
 /**
  * Loads 15x15 maze layouts stored under resources. Each maze uses '#' for
- * walls and either spaces or 'R' (room tiles) for walkable cells.
+ * walls, 'E' for exit, and spaces for walkable cells.
  */
 public class MazeLoader {
     private static final String BASE_PATH = "/com/team12/redCorridor/ui/mazes_15x15_rooms_open_txt/";
