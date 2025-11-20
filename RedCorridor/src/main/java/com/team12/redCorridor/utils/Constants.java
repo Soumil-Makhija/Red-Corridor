@@ -13,17 +13,10 @@ public class Constants {
     public static final int PLAYER_MAX_HEALTH = 100;
     public static final int DRONE_DAMAGE = 10;
     public static final int MEDKIT_HEAL_AMOUNT = 20;
-    public static final int FRAGMENT_COUNT = 6;
-    public static final int MEDKIT_COUNT = 6;
-    public static final int TRAP_COUNT = 4;
-    public static final int DRONE_TRIGGER_ROOM_COUNT = 4;
-    public static final int EMPTY_ROOM_COUNT = 4;
-    public static final int DRONE_COUNT = 6;
+    public static final int DAMAGE = 50;
 
     // resources
     public static final String ASSET_PATH = "assets/";
     public static final String IMAGE_PATH = ASSET_PATH + "images/";
     public static final String SOUND_PATH = ASSET_PATH + "sounds/";
-    public static final String SAVE_FILE_PATH = ASSET_PATH + "save.dat";
-
 }

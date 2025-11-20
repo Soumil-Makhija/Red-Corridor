@@ -27,17 +27,168 @@
       </VBox>
    </top>
    <center>
-      <StackPane alignment="TOP_CENTER" BorderPane.alignment="CENTER">
-         <children>
-            <Label prefWidth="520.0" text="You are a captured pilot aboard an enemy cruiser after a sabotage mission gone wrong.&#10;Your only hope of escape lies in piecing together the fragments of the enemy crew's access keys hidden throughout the ship.&#10;Stay alert for the drones and traps they left behind and move quickly.&#10;Once you reassemble the key, you can unlock the hangar bay and make a run for your ship!" textAlignment="CENTER" wrapText="true">
-               <font>
-                  <Font size="18.0" />
-               </font>
-            </Label>
-         </children>
+      <StackPane alignment="TOP_CENTER" prefWidth="600.0" BorderPane.alignment="CENTER">
          <padding>
-            <Insets bottom="32.0" left="32.0" right="32.0" top="32.0" />
+            <Insets bottom="10.0" left="32.0" right="32.0" top="10.0" />
          </padding>
+         <children>
+            <HBox prefHeight="100.0" prefWidth="559.0">
+               <children>
+                  <VBox alignment="TOP_CENTER" prefHeight="206.0" prefWidth="361.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label alignment="CENTER" prefHeight="17.0" prefWidth="78.0" text="World Config" VBox.vgrow="ALWAYS" />
+                        <Separator prefWidth="361.0" />
+                        <HBox alignment="TOP_CENTER" prefWidth="361.0">
+                           <children>
+                              <VBox prefHeight="200.0" prefWidth="100.0">
+                                 <children>
+                                    <Label text="Map Size">
+                                       <VBox.margin>
+                                          <Insets bottom="5.0" top="5.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                    <Label layoutX="20.0" layoutY="15.0" text="Fragments">
+                                       <VBox.margin>
+                                          <Insets bottom="5.0" top="5.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                    <Label layoutX="20.0" layoutY="15.0" text="Medkits">
+                                       <VBox.margin>
+                                          <Insets bottom="5.0" top="5.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                    <Label layoutX="20.0" layoutY="54.0" text="Traps">
+                                       <VBox.margin>
+                                          <Insets bottom="5.0" top="5.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                    <Label layoutX="20.0" layoutY="71.0" text="Drone Rooms">
+                                       <VBox.margin>
+                                          <Insets bottom="5.0" top="5.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                    <Label layoutX="20.0" layoutY="88.0" text="Empty Rooms">
+                                       <VBox.margin>
+                                          <Insets bottom="5.0" top="5.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                    <Label layoutX="20.0" layoutY="105.0" text="Drone Damage">
+                                       <VBox.margin>
+                                          <Insets bottom="5.0" top="5.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                    <Label layoutX="20.0" layoutY="177.0" text="Trap Damage">
+                                       <VBox.margin>
+                                          <Insets bottom="5.0" top="5.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                    <Label layoutX="20.0" layoutY="199.0" text="Medkit heal">
+                                       <VBox.margin>
+                                          <Insets bottom="5.0" top="5.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                 </children>
+                                 <opaqueInsets>
+                                    <Insets />
+                                 </opaqueInsets>
+                                 <HBox.margin>
+                                    <Insets />
+                                 </HBox.margin>
+                                 <padding>
+                                    <Insets left="10.0" top="5.0" />
+                                 </padding>
+                              </VBox>
+                              <VBox prefHeight="200.0" prefWidth="100.0">
+                                 <children>
+                                    <Label fx:id="mapSizeValueLabel" text="15">
+                                       <VBox.margin>
+                                          <Insets bottom="5.0" top="5.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                    <Label fx:id="fragmentsValueLabel" text="0">
+                                       <VBox.margin>
+                                          <Insets bottom="5.0" top="5.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                    <Label fx:id="medkitsValueLabel" text="0">
+                                       <VBox.margin>
+                                          <Insets bottom="5.0" top="5.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                    <Label fx:id="trapsValueLabel" text="0">
+                                       <VBox.margin>
+                                          <Insets bottom="5.0" top="5.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                    <Label fx:id="droneRoomsValueLabel" text="0">
+                                       <VBox.margin>
+                                          <Insets bottom="5.0" top="5.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                    <Label fx:id="emptyRoomsValueLabel" text="0">
+                                       <VBox.margin>
+                                          <Insets bottom="5.0" top="5.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                    <Label fx:id="droneDamageValueLabel" text="0">
+                                       <VBox.margin>
+                                          <Insets bottom="5.0" top="5.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                    <Label fx:id="trapDamageValueLabel" text="0">
+                                       <VBox.margin>
+                                          <Insets bottom="5.0" top="5.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                    <Label fx:id="medkitHealValueLabel" text="0">
+                                       <VBox.margin>
+                                          <Insets bottom="5.0" top="5.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                 </children>
+                                 <padding>
+                                    <Insets left="10.0" top="5.0" />
+                                 </padding>
+                              </VBox>
+                           </children>
+                        </HBox>
+                     </children></VBox>
+                  <Separator orientation="VERTICAL" prefHeight="206.0" prefWidth="14.0" />
+                  <VBox alignment="TOP_CENTER" prefHeight="206.0" prefWidth="146.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label alignment="CENTER" prefHeight="17.0" prefWidth="47.0" text="Presets" VBox.vgrow="ALWAYS" />
+                        <Separator prefWidth="361.0">
+                           <VBox.margin>
+                              <Insets bottom="5.0" />
+                           </VBox.margin>
+                        </Separator>
+                        <Label fx:id="easyModeLabel" text="Easy">
+                           <padding>
+                              <Insets bottom="5.0" top="5.0" />
+                           </padding>
+                        </Label>
+                        <Label fx:id="mediumModeLabel" layoutX="72.0" layoutY="30.0" text="Medium">
+                           <padding>
+                              <Insets bottom="5.0" top="5.0" />
+                           </padding>
+                        </Label>
+                        <Label fx:id="hardModeLabel" layoutX="72.0" layoutY="47.0" text="Hard">
+                           <padding>
+                              <Insets bottom="5.0" top="5.0" />
+                           </padding>
+                        </Label>
+                        <Label fx:id="extremeModeLabel" layoutX="72.0" layoutY="64.0" text="Extreme">
+                           <padding>
+                              <Insets bottom="5.0" top="5.0" />
+                           </padding>
+                        </Label>
+                     </children>
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin></VBox>
+               </children>
+            </HBox>
+         </children>
       </StackPane>
    </center>
    <bottom>
@@ -48,12 +199,12 @@
                <children>
                   <Label text="[H]elp" />
                   <Region HBox.hgrow="ALWAYS" />
-                  <Label text="[N]ew Game" />
+                  <Label text="[ENTER] Choose mode" />
                   <Region HBox.hgrow="ALWAYS" />
                   <Label text="[Q]uit" />
                </children>
                <padding>
-                  <Insets bottom="16.0" left="24.0" right="24.0" top="8.0" />
+                  <Insets bottom="16.0" left="24.0" right="24.0" />
             </padding>
             </HBox>
          </children>

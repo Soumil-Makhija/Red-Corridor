@@ -1,11 +1,11 @@
 package com.team12.redCorridor.entities;
 
+import com.team12.redCorridor.utils.Constants;
+
 /**
  * Represents a trap
  */
 public class Trap {
-    private static final int DAMAGE = 50;
-
     private final Position position;
 
     public Trap(Position position) {
@@ -17,6 +17,6 @@ public class Trap {
     }
 
     public int getDamage() {
-        return DAMAGE;
+        return Constants.DAMAGE;
     }
 }

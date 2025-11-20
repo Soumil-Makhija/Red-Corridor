@@ -61,6 +61,8 @@ public class GameFactory {
             throw new IllegalStateException("Maze does not contain any playable tiles.");
         }
 
+        GameMode mode = GameSettings.getCurrentMode();
+
         Position start = copy(findClosestToCenter(openTiles));
         world.player = new Player(new Position(start.getX(), start.getY()));
         removePosition(openTiles, start);
@@ -72,13 +74,13 @@ public class GameFactory {
         Collections.shuffle(placementPool, random);
 
         int fragmentsPlaced = placeHiddenTiles(placementPool, world.baseMap, world.hiddenItems, MapVisuals.FRAGMENT,
-                Constants.FRAGMENT_COUNT);
-        placeHiddenTiles(placementPool, world.baseMap, world.hiddenItems, MapVisuals.MEDKIT, Constants.MEDKIT_COUNT);
-        placeHiddenTiles(placementPool, world.baseMap, world.hiddenItems, MapVisuals.TRAP, Constants.TRAP_COUNT);
+                mode.fragments());
+        placeHiddenTiles(placementPool, world.baseMap, world.hiddenItems, MapVisuals.MEDKIT, mode.medkits());
+        placeHiddenTiles(placementPool, world.baseMap, world.hiddenItems, MapVisuals.TRAP, mode.traps());
         placeHiddenTiles(placementPool, world.baseMap, world.hiddenItems, MapVisuals.DRONE_TRIGGER,
-                Constants.DRONE_TRIGGER_ROOM_COUNT);
-        placeHiddenTiles(placementPool, world.baseMap, world.hiddenItems, MapVisuals.EMPTY, Constants.EMPTY_ROOM_COUNT);
-        spawnDrones(world, placementPool, Constants.DRONE_COUNT);
+                mode.droneRooms());
+        placeHiddenTiles(placementPool, world.baseMap, world.hiddenItems, MapVisuals.EMPTY, mode.emptyRooms());
+        spawnDrones(world, placementPool, mode.drones());
 
         world.totalFragmentsRequired = fragmentsPlaced;
         world.startTimeMillis = System.currentTimeMillis();
