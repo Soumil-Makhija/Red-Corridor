@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
+import com.team12.redCorridor.utils.Constants;
 
 /**
  * Loads 15x15 maze layouts stored under resources. Each maze uses '#' for
@@ -25,7 +26,6 @@ public class MazeLoader {
             "maze_rooms_open_9.txt",
             "maze_rooms_open_10.txt"
     };
-    private static final int MAZE_SIZE = 15;
 
     private final Random random;
 
@@ -39,7 +39,7 @@ public class MazeLoader {
 
     public char[][] loadRandomMaze() {
         String file = MAZE_FILES[random.nextInt(MAZE_FILES.length)];
-        System.out.println("[MazeLoader] Loading maze: " + file);
+        System.out.println("[MazeLoader] Loading maze: " + file); // for debugging
         return loadMaze(file);
     }
 
@@ -50,29 +50,31 @@ public class MazeLoader {
             }
 
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
-                char[][] grid = new char[MAZE_SIZE][MAZE_SIZE];
+                char[][] grid = new char[Constants.MAP_SIZE][Constants.MAP_SIZE];
                 String line;
                 int row = 0;
                 while ((line = reader.readLine()) != null) {
                     if (line.isEmpty()) {
                         continue;
                     }
-                    if (row >= MAZE_SIZE) {
-                        throw new IllegalStateException("Maze " + fileName + " has more than " + MAZE_SIZE + " rows.");
-                    }
-                    if (line.length() < MAZE_SIZE) {
+                    if (row >= Constants.MAP_SIZE) {
                         throw new IllegalStateException(
-                                "Row " + row + " in maze " + fileName + " is shorter than " + MAZE_SIZE
+                                "Maze " + fileName + " has more than " + Constants.MAP_SIZE + " rows.");
+                    }
+                    if (line.length() < Constants.MAP_SIZE) {
+                        throw new IllegalStateException(
+                                "Row " + row + " in maze " + fileName + " is shorter than " + Constants.MAP_SIZE
                                         + " characters.");
                     }
-                    for (int col = 0; col < MAZE_SIZE; col++) {
+                    for (int col = 0; col < Constants.MAP_SIZE; col++) {
                         grid[row][col] = line.charAt(col);
                     }
                     row++;
                 }
-                if (row != MAZE_SIZE) {
+                if (row != Constants.MAP_SIZE) {
                     throw new IllegalStateException(
-                            "Maze " + fileName + " must contain exactly " + MAZE_SIZE + " rows but had " + row + ".");
+                            "Maze " + fileName + " must contain exactly " + Constants.MAP_SIZE + " rows but had " + row
+                                    + ".");
                 }
                 return grid;
             }

@@ -74,6 +74,9 @@
                                        <image>
                                           <Image url="@../icons/open-door.png" />
                                        </image>
+                                       <HBox.margin>
+                                          <Insets left="1.0" />
+                                       </HBox.margin>
                                     </ImageView>
                                     <Label alignment="CENTER" prefHeight="34.0" prefWidth="80.0" text="Open Door" />
                                  </children>
@@ -94,6 +97,9 @@
                                        <image>
                                           <Image url="@../icons/exit.png" />
                                        </image>
+                                       <HBox.margin>
+                                          <Insets left="3.0" />
+                                       </HBox.margin>
                                     </ImageView>
                                     <Label alignment="CENTER" prefHeight="34.0" prefWidth="78.0" text="Exit" />
                                  </children>
@@ -136,7 +142,7 @@
                                           <Image url="@../icons/medkit.png" />
                                        </image>
                                        <HBox.margin>
-                                          <Insets left="3.0" />
+                                          <Insets left="2.0" />
                                        </HBox.margin>
                                     </ImageView>
                                     <Label alignment="CENTER" prefHeight="34.0" prefWidth="66.0" text="Medkit" />
