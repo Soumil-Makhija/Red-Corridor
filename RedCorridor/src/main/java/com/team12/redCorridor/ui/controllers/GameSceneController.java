@@ -206,6 +206,7 @@ public class GameSceneController extends Controller {
 
     // switch to win/defeat scene
     private void showSummaryScene(String resource) {
+        int[][] revealedMap = buildRevealedMap();
         stopEngine();
 
         Stage currentStage = stage != null ? stage : getPrimaryStage();
@@ -224,7 +225,11 @@ public class GameSceneController extends Controller {
             summaryController.recordKey(summaryScene);
 
             if (lastSnapshot != null) {
-                summaryController.setMapData(lastSnapshot.tiles());
+                if (revealedMap != null) {
+                    summaryController.setMapData(revealedMap);
+                } else {
+                    summaryController.setMapData(lastSnapshot.tiles());
+                }
                 summaryController.setStats(new SummaryStats(
                         lastSnapshot.fragmentsCollected(),
                         lastSnapshot.fragmentsRequired(),
@@ -246,6 +251,28 @@ public class GameSceneController extends Controller {
             engine.stop();
             engine = null;
         }
+    }
+
+    private int[][] buildRevealedMap() {
+        if (engine == null) {
+            return null;
+        }
+        World world = engine.getWorld();
+        if (world == null) {
+            return null;
+        }
+        int size = Constants.MAP_SIZE;
+        int[][] revealed = new int[size][size];
+        for (int y = 0; y < size; y++) {
+            System.arraycopy(world.map[y], 0, revealed[y], 0, size);
+            for (int x = 0; x < size; x++) {
+                int hidden = world.hiddenItems[y][x];
+                if (hidden != MapVisuals.EMPTY) {
+                    revealed[y][x] = hidden;
+                }
+            }
+        }
+        return revealed;
     }
 
     // get minutes and seconds from milliseconds

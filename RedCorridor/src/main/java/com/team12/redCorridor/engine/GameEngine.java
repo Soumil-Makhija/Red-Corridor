@@ -77,6 +77,10 @@ public class GameEngine implements Runnable {
         return state;
     }
 
+    public World getWorld() {
+        return world;
+    }
+
     @Override
     public void run() {
         final int TARGET_FPS = 60; // desired frames per second
