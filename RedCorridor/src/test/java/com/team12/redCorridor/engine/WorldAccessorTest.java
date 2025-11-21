@@ -9,21 +9,21 @@ public class WorldAccessorTest {
     @Test
     public void uninitializedHealthIsZero() {
         World world =  new World();
-        assertEquals(world.hp(), 0);
+        assertEquals(0, world.hp());
     }
     @Test
     public void uninitializedMedkitCountIsZero() {
         World world =  new World();
-        assertEquals(world.medkits(), 0);
+        assertEquals(0, world.medkits());
     }
     @Test
     public void zeroFragmentsWhenPlayerNotInitialized() {
         World world =  new World();
-        assertEquals(world.fragmentsCollected(), 0);
+        assertEquals(0, world.fragmentsCollected());
     }
     @Test
     public void elapsedMillisIsZeroBeforeGameStart() {
         World world =  new World();
-        assertEquals(world.elapsedMillis(), 0);
+        assertEquals(0, world.elapsedMillis());
     }
 }
