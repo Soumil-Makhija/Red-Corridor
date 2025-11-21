@@ -199,6 +199,8 @@
                <children>
                   <Label text="[H]elp" />
                   <Region HBox.hgrow="ALWAYS" />
+                  <Label layoutX="34.0" layoutY="10.0" text="[D]escription" />
+                  <Region layoutX="84.0" layoutY="10.0" HBox.hgrow="ALWAYS" />
                   <Label text="[ENTER] Choose mode" />
                   <Region HBox.hgrow="ALWAYS" />
                   <Label text="[Q]uit" />

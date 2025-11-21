@@ -1,5 +1,6 @@
 package com.team12.redCorridor.ui.controllers;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -8,9 +9,12 @@ import com.team12.redCorridor.engine.GameSettings;
 import com.team12.redCorridor.utils.Constants;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyEvent;
+import javafx.stage.Stage;
 
 /**
  * Controller for Lobby Scene
@@ -67,12 +71,39 @@ public class LobbySceneController extends Controller {
                 case W, UP -> moveSelection(-1);
                 case S, DOWN -> moveSelection(1);
                 case ENTER, N -> startSelectedMode(event);
+                case D -> description();
                 case H -> helpMenu();
                 case Q -> quit(event);
                 default -> {
                 }
             }
         });
+    }
+
+    private void description() {
+        Stage targetStage = getPrimaryStage();
+        if (targetStage == null) {
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/team12/redCorridor/ui/scenes/DescriptionScene.fxml"));
+            Parent root = loader.load();
+            DescriptionSceneController controller = loader.getController();
+            Scene scene = new Scene(root);
+
+            controller.setStage(targetStage);
+            controller.recordKey(scene);
+            targetStage.setScene(scene);
+            targetStage.sizeToScene();
+            targetStage.centerOnScreen();
+            targetStage.show();
+            targetStage.toFront();
+            targetStage.requestFocus();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void moveSelection(int delta) {
