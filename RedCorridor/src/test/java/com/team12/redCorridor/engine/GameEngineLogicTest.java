@@ -161,4 +161,10 @@ public class GameEngineLogicTest {
         assertEquals(MapVisuals.TRAP, world.revealedItems[targetY][targetX]);
         assertEquals(MapVisuals.OPEN_DOOR, world.baseMap[targetY][targetX]);
     }
+
+    @Test
+    public void runTest() throws Exception {
+
+
+    }
 }

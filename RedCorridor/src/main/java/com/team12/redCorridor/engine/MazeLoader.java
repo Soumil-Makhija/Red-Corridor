@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
+
 import com.team12.redCorridor.utils.Constants;
 
 /**
@@ -44,40 +45,39 @@ public class MazeLoader {
     }
 
     public char[][] loadMaze(String fileName) {
-        try (InputStream is = MazeLoader.class.getResourceAsStream(BASE_PATH + fileName)) {
-            if (is == null) {
-                throw new IllegalArgumentException("Maze file not found: " + fileName);
-            }
+        InputStream is = MazeLoader.class.getResourceAsStream(BASE_PATH + fileName);
+        if (is == null) {
+            throw new IllegalArgumentException("Maze file not found: " + fileName);
+        }
 
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
-                char[][] grid = new char[Constants.MAP_SIZE][Constants.MAP_SIZE];
-                String line;
-                int row = 0;
-                while ((line = reader.readLine()) != null) {
-                    if (line.isEmpty()) {
-                        continue;
-                    }
-                    if (row >= Constants.MAP_SIZE) {
-                        throw new IllegalStateException(
-                                "Maze " + fileName + " has more than " + Constants.MAP_SIZE + " rows.");
-                    }
-                    if (line.length() < Constants.MAP_SIZE) {
-                        throw new IllegalStateException(
-                                "Row " + row + " in maze " + fileName + " is shorter than " + Constants.MAP_SIZE
-                                        + " characters.");
-                    }
-                    for (int col = 0; col < Constants.MAP_SIZE; col++) {
-                        grid[row][col] = line.charAt(col);
-                    }
-                    row++;
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
+            char[][] grid = new char[Constants.MAP_SIZE][Constants.MAP_SIZE];
+            String line;
+            int row = 0;
+            while ((line = reader.readLine()) != null) {
+                if (line.isEmpty()) {
+                    continue;
                 }
-                if (row != Constants.MAP_SIZE) {
+                if (row >= Constants.MAP_SIZE) {
                     throw new IllegalStateException(
-                            "Maze " + fileName + " must contain exactly " + Constants.MAP_SIZE + " rows but had " + row
-                                    + ".");
+                            "Maze " + fileName + " has more than " + Constants.MAP_SIZE + " rows.");
                 }
-                return grid;
+                if (line.length() != Constants.MAP_SIZE) {
+                    throw new IllegalStateException(
+                            "Row " + row + " in maze " + fileName + " is not equal to " + Constants.MAP_SIZE
+                                    + " characters.");
+                }
+                for (int col = 0; col < Constants.MAP_SIZE; col++) {
+                    grid[row][col] = line.charAt(col);
+                }
+                row++;
             }
+            if (row != Constants.MAP_SIZE) {
+                throw new IllegalStateException(
+                        "Maze " + fileName + " must contain exactly " + Constants.MAP_SIZE + " rows but had " + row
+                                + ".");
+            }
+            return grid;
         } catch (IOException e) {
             throw new RuntimeException("Failed to load maze " + fileName, e);
         }

@@ -52,4 +52,21 @@ public class MazeLoaderTest {
             assertEquals(Constants.MAP_SIZE, grid[row].length);
         }
     }
+    @Test
+    public void loadMazeWithBlankLinesReturnsValidSize() {
+        MazeLoader loader = new MazeLoader();
+        char[][] gridWithBlanks = loader.loadMaze("maze_test_blanks.txt");
+
+        assertEquals(Constants.MAP_SIZE, gridWithBlanks.length);
+    }
+    @Test(expected = IllegalStateException.class)
+    public void loadingMazeWithExtraRowsThrowsException() {
+        MazeLoader loader = new MazeLoader();
+        loader.loadMaze("maze_test_extra_rows.txt");
+    }
+    @Test(expected = IllegalStateException.class)
+    public void loadingMazeWithExtraColumnsThrowsException() {
+        MazeLoader loader = new MazeLoader();
+        loader.loadMaze("maze_test_extra_columns.txt");
+    }
 }
