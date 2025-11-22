@@ -1,16 +1,12 @@
 package com.team12.redCorridor.entities;
+
 // This class represents a collectible key fragment in the game
 public class KeyFragment {
-
-    // The position of the key fragment on the map
-    private Position position;
-
     // Tells whether the key fragment has been collected or not
     private boolean collected;
 
     // Constructor: sets where the key fragment is and marks it as not collected yet
     public KeyFragment(Position position) {
-        this.position = position;
         this.collected = false; // starts as not collected
     }
 

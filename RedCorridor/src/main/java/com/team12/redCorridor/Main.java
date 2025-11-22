@@ -8,13 +8,17 @@ import com.team12.redCorridor.engine.GameFactory;
 import com.team12.redCorridor.engine.GameSnapshot;
 import com.team12.redCorridor.engine.GameState;
 import com.team12.redCorridor.engine.InputHandler;
+import com.team12.redCorridor.engine.World;
 
+/**
+ * Main
+ */
 public class Main {
     public static void main(String[] args) {
         System.out.println("Starting RedCorridor...");
 
         GameFactory factory = new GameFactory();
-        GameFactory.World world = factory.createDefaultWorld();
+        World world = factory.createDefaultWorld();
         InputHandler input = new InputHandler();
         EngineListener listener = new EngineListener() {
             @Override

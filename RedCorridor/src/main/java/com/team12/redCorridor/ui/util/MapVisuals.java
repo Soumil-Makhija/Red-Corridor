@@ -13,11 +13,11 @@ public final class MapVisuals {
     public static final int DRONE = 3;
     public static final int MEDKIT = 4;
     public static final int EXIT = 5;
-    public static final int DANGER = 6;
+    public static final int TRAP = 6;
     public static final int FRAGMENT = 7;
     public static final int DOOR = 8;
     public static final int OPEN_DOOR = 9;
-    // public static final int BLAST_DOOR = 10;
+    public static final int DRONE_TRIGGER = 10;
 
     // icons path
     private static final String ICON_BASE = "/com/team12/redCorridor/ui/icons/";
@@ -28,7 +28,7 @@ public final class MapVisuals {
     private static final Image EXIT_IMAGE = loadImage("exit.png");
     private static final Image CLOSED_DOOR_IMAGE = loadImage("close-door.png");
     private static final Image OPEN_DOOR_IMAGE = loadImage("open-door.png");
-    private static final Image HAZARD_IMAGE = loadImage("hazard.png");
+    private static final Image TRAP_IMAGE = loadImage("hazard.png");
     private static final Image FRAGMENT_IMAGE = loadImage("fragment.png");
 
     private MapVisuals() {
@@ -95,7 +95,7 @@ public final class MapVisuals {
             case EXIT -> EXIT_IMAGE;
             case DOOR -> CLOSED_DOOR_IMAGE;
             case OPEN_DOOR -> OPEN_DOOR_IMAGE;
-            case DANGER -> HAZARD_IMAGE;
+            case TRAP -> TRAP_IMAGE;
             case FRAGMENT -> FRAGMENT_IMAGE;
             default -> null;
         };
@@ -127,8 +127,9 @@ public final class MapVisuals {
             case EXIT -> "Exit";
             case DOOR -> "Door";
             case OPEN_DOOR -> "Open Door";
-            case DANGER -> "Radiation Hazard";
+            case TRAP -> "Trap";
             case FRAGMENT -> "Key Fragment";
+            case DRONE_TRIGGER -> "Drone Trigger";
             default -> "Unknown";
         };
     }

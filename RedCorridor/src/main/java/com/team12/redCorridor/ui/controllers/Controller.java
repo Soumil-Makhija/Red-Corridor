@@ -95,6 +95,8 @@ public abstract class Controller {
             targetStage.setScene(lobbyScene);
             lobbyController.setStage(targetStage);
             lobbyController.recordKey(lobbyScene);
+            targetStage.sizeToScene();
+            targetStage.centerOnScreen();
             targetStage.show();
             targetStage.toFront();
             targetStage.requestFocus();
@@ -119,6 +121,8 @@ public abstract class Controller {
             controller.setStage(currentStage);
             controller.recordKey(gameScene);
             currentStage.setScene(gameScene);
+            currentStage.sizeToScene();
+            currentStage.centerOnScreen();
             currentStage.show();
         } catch (IOException ex) {
             ex.printStackTrace();

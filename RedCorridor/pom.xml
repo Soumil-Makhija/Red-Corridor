@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.team12.redCorridor</groupId>
@@ -18,6 +21,7 @@
     <javafx.version>21.0.3</javafx.version>
   </properties>
 
+  <!-- ======================= DEPENDENCIES ======================= -->
   <dependencies>
 
     <dependency>
@@ -26,31 +30,34 @@
       <version>${javafx.version}</version>
     </dependency>
 
-
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-controls</artifactId>
       <version>${javafx.version}</version>
     </dependency>
 
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx</artifactId>
+      <version>${javafx.version}</version>
+      <type>pom</type>
+    </dependency>
 
-  	<dependency>
-  		<groupId>org.openjfx</groupId>
-  		<artifactId>javafx</artifactId>
-  		<version>${javafx.version}</version>
-  		<type>pom</type>
-  	</dependency>
-
+    <!-- JUnit -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.11</version>
       <scope>test</scope>
     </dependency>
+
   </dependencies>
 
+  <!-- ======================= BUILD ======================= -->
   <build>
-    <pluginManagement><plugins>
+
+    <pluginManagement>
+      <plugins>
         <plugin>
           <artifactId>maven-clean-plugin</artifactId>
           <version>3.1.0</version>
@@ -89,7 +96,10 @@
         </plugin>
       </plugins>
     </pluginManagement>
+
     <plugins>
+
+      <!-- JavaFX plugin -->
       <plugin>
         <groupId>org.openjfx</groupId>
         <artifactId>javafx-maven-plugin</artifactId>
@@ -98,6 +108,35 @@
           <mainClass>com.team12.redCorridor.ui.App</mainClass>
         </configuration>
       </plugin>
+
+      <!-- JACOCO PLUGIN (FOR COVERAGE) -->
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.11</version>
+        <executions>
+
+          <!-- Attach Jacoco before tests run -->
+          <execution>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+
+          <!-- Generate report after mvn test -->
+          <execution>
+            <id>report</id>
+            <phase>test</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+
+        </executions>
+      </plugin>
+
     </plugins>
+
   </build>
+
 </project>

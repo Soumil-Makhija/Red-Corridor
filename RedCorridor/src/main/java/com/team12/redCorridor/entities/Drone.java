@@ -27,24 +27,25 @@ public class Drone {
         this.active = true;
     }
 
-
-    // This method makes the drone move one step closer to the target each time it’s called 
+    // This method makes the drone move one step closer to the target each time it’s
+    // called
     public void moveToward(Position target) {
         // Stop if this object is not active or the target doesn't exist
         if (!active || target == null) {
             return;
         }
-    
-        // Find the difference in X and Y positions between the current position and the target
+
+        // Find the difference in X and Y positions between the current position and the
+        // target
         int xDifference = target.getX() - position.getX();
         int yDifference = target.getY() - position.getY();
-    
+
         // Move one step closer to the target
         // If the target is farther away in the X direction, move in X
         if (Math.abs(xDifference) > Math.abs(yDifference)) {
             // Move right if xDifference is positive, left if negative
             position.setX(position.getX() + Integer.signum(xDifference));
-        } 
+        }
         // Otherwise, move one step in the Y direction
         else {
             // Move down if yDifference is positive, up if negative
@@ -57,8 +58,16 @@ public class Drone {
         active = false;
     }
 
-    //   Getters (to read private values)
-    public boolean isActive() { return active; }     // Check if drone is still active
-    public Position getPosition() { return position; } // Get current position
-    public int getDamage() { return damage; }        // Get how much damage it can deal
+    // Getters (to read private values)
+    public boolean isActive() {
+        return active;
+    } // Check if drone is still active
+
+    public Position getPosition() {
+        return position;
+    } // Get current position
+
+    public int getDamage() {
+        return damage;
+    } // Get how much damage it can deal
 }

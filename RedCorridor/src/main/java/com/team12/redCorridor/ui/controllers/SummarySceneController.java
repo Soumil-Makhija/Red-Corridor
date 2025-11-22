@@ -7,13 +7,12 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
+import com.team12.redCorridor.utils.Constants;
 
 /**
  * Abstract Controller for Summary Scenes
  */
 public abstract class SummarySceneController extends Controller {
-    private static final int DEFAULT_MAP_SIZE = 10; // hard coded
-
     @FXML
     protected Pane mapPane;
     @FXML
@@ -95,7 +94,7 @@ public abstract class SummarySceneController extends Controller {
             dronesStatLabel.setText("Drones triggered: " + summaryStats.getDronesTriggered());
         }
         if (trapsStatLabel != null) {
-            trapsStatLabel.setText("Hazards triggered: " + summaryStats.getHazardsTriggered());
+            trapsStatLabel.setText("Traps triggered: " + summaryStats.getTrapsTriggered());
         }
         if (timeStatLabel != null) {
             timeStatLabel.setText("Time taken: " + formatElapsedTime(summaryStats.getElapsedMillis()));
@@ -106,17 +105,17 @@ public abstract class SummarySceneController extends Controller {
     }
 
     private int[][] defaultMap() {
-        int[][] defaultTiles = new int[DEFAULT_MAP_SIZE][DEFAULT_MAP_SIZE];
-        for (int y = 0; y < DEFAULT_MAP_SIZE; y++) {
-            for (int x = 0; x < DEFAULT_MAP_SIZE; x++) {
-                if (y == 0 || y == DEFAULT_MAP_SIZE - 1 || x == 0 || x == DEFAULT_MAP_SIZE - 1) {
+        int[][] defaultTiles = new int[Constants.MAP_SIZE][Constants.MAP_SIZE];
+        for (int y = 0; y < Constants.MAP_SIZE; y++) {
+            for (int x = 0; x < Constants.MAP_SIZE; x++) {
+                if (y == 0 || y == Constants.MAP_SIZE - 1 || x == 0 || x == Constants.MAP_SIZE - 1) {
                     defaultTiles[y][x] = MapVisuals.WALL;
                 } else {
                     defaultTiles[y][x] = MapVisuals.EMPTY;
                 }
             }
         }
-        defaultTiles[DEFAULT_MAP_SIZE / 2][DEFAULT_MAP_SIZE / 2] = MapVisuals.PLAYER;
+        defaultTiles[Constants.MAP_SIZE / 2][Constants.MAP_SIZE / 2] = MapVisuals.PLAYER;
         return defaultTiles;
     }
 

@@ -1,10 +1,15 @@
 package com.team12.redCorridor.engine;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 import com.team12.redCorridor.entities.Drone;
 import com.team12.redCorridor.entities.KeyFragment;
-import com.team12.redCorridor.entities.Medkit;
 import com.team12.redCorridor.entities.Player;
 import com.team12.redCorridor.entities.Position;
+import com.team12.redCorridor.entities.Trap;
+import com.team12.redCorridor.utils.Constants;
 import com.team12.redCorridor.ui.util.MapVisuals;
 
 /**
@@ -14,13 +19,10 @@ import com.team12.redCorridor.ui.util.MapVisuals;
  * - stop(): requests shutdown and waits for the thread to finish
  * - run(): main loop that calls update() and render() at the target FPS
  */
-// Keep this class small and synchronous — move game logic into other engine
-// classes
-
 public class GameEngine implements Runnable {
     private static final long MOVE_INTERVAL_NS = 120_000_000L; // ~120 ms between steps
 
-    private final GameFactory.World world;
+    private final World world;
     private final InputHandler input;
     private final EngineListener listener;
 
@@ -32,8 +34,9 @@ public class GameEngine implements Runnable {
 
     private long lastMoveTimeNs = 0L;
     private String lastMessage = "Use WASD/Arrow keys to move.";
+    private final Random random = new Random();
 
-    public GameEngine(GameFactory.World world, InputHandler input, EngineListener listener) {
+    public GameEngine(World world, InputHandler input, EngineListener listener) {
         this.world = world;
         this.input = input;
         this.listener = listener;
@@ -72,6 +75,10 @@ public class GameEngine implements Runnable {
      */
     public GameState getState() {
         return state;
+    }
+
+    public World getWorld() {
+        return world;
     }
 
     @Override
@@ -137,6 +144,11 @@ public class GameEngine implements Runnable {
             }
         }
 
+        String medkitMessage = null;
+        if (input != null && input.consumeMedkitRequest()) {
+            medkitMessage = useMedkitFromInventory();
+        }
+
         // 4) Win/Lose checks
         GameState nextState = null;
         if (world.player.getHealth() <= 0) {
@@ -146,7 +158,10 @@ public class GameEngine implements Runnable {
         }
 
         // 5) Notify UI
-        GameFactory.refreshDynamicMap(world);
+        if (medkitMessage != null) {
+            setMessage(medkitMessage);
+        }
+        GameFactory.refreshDynamicMap(world); // update new icons
         if (listener != null)
             listener.onFrame(buildSnapshot());
 
@@ -165,8 +180,11 @@ public class GameEngine implements Runnable {
     }
 
     private boolean attemptMove(Player player, int dx, int dy) {
-        int nx = player.getPosition().getX() + dx;
-        int ny = player.getPosition().getY() + dy;
+        int prevX = player.getPosition().getX();
+        int prevY = player.getPosition().getY();
+        // new temp position
+        int nx = prevX + dx;
+        int ny = prevY + dy;
 
         if (!isWithinBounds(nx, ny)) {
             setMessage("Can't move outside the map.");
@@ -195,13 +213,35 @@ public class GameEngine implements Runnable {
             int hiddenItem = world.hiddenItems[ny][nx];
             if (hiddenItem != MapVisuals.EMPTY) {
                 // Reveal the actual item
-                world.baseMap[ny][nx] = hiddenItem;
-                interactionMessage = switch (hiddenItem) {
-                    case MapVisuals.FRAGMENT -> collectFragmentAt(nx, ny);
-                    case MapVisuals.MEDKIT -> applyMedkitAt(nx, ny);
-                    case MapVisuals.DANGER -> triggerHazardAt(nx, ny);
-                    default -> "Door opened.";
-                };
+                switch (hiddenItem) {
+                    case MapVisuals.FRAGMENT: {
+                        world.baseMap[ny][nx] = hiddenItem;
+                        collectFragmentAt(nx, ny);
+                        interactionMessage = "You found a fragment.";
+                        break;
+                    }
+                    case MapVisuals.MEDKIT: {
+                        world.baseMap[ny][nx] = hiddenItem;
+                        interactionMessage = collectMedkitAt(nx, ny);
+                        break;
+                    }
+                    case MapVisuals.TRAP: {
+                        world.baseMap[ny][nx] = hiddenItem;
+                        triggerTrapAt(nx, ny);
+                        interactionMessage = "A trap was triggered!";
+                        break;
+                    }
+                    case MapVisuals.DRONE_TRIGGER: {
+                        triggerDroneSpawnAt(nx, ny);
+                        interactionMessage = "A drone has been activated!";
+                        break;
+                    }
+                    default: {
+                        world.baseMap[ny][nx] = MapVisuals.OPEN_DOOR;
+                        interactionMessage = "Door opened.";
+                        break;
+                    }
+                }
             } else {
                 // Empty door
                 world.baseMap[ny][nx] = MapVisuals.OPEN_DOOR;
@@ -211,12 +251,14 @@ public class GameEngine implements Runnable {
             // Normal tile interaction
             interactionMessage = switch (tile) {
                 case MapVisuals.FRAGMENT -> collectFragmentAt(nx, ny);
-                case MapVisuals.MEDKIT -> applyMedkitAt(nx, ny);
-                case MapVisuals.DANGER -> triggerHazardAt(nx, ny);
+                case MapVisuals.MEDKIT -> collectMedkitAt(nx, ny);
+                case MapVisuals.TRAP -> triggerTrapAt(nx, ny);
+                case MapVisuals.DRONE_TRIGGER -> triggerDroneSpawnAt(nx, ny);
                 default -> null;
             };
         }
 
+        // display game message
         if (interactionMessage != null) {
             setMessage(interactionMessage);
         }
@@ -224,7 +266,7 @@ public class GameEngine implements Runnable {
     }
 
     private boolean isWithinBounds(int x, int y) {
-        return x >= 0 && x < GameFactory.World.MAP_SIZE && y >= 0 && y < GameFactory.World.MAP_SIZE;
+        return x >= 0 && x < Constants.MAP_SIZE && y >= 0 && y < Constants.MAP_SIZE;
     }
 
     private boolean isWalkable(int x, int y) {
@@ -235,23 +277,85 @@ public class GameEngine implements Runnable {
         KeyFragment fragment = new KeyFragment(new Position(x, y));
         fragment.collect();
         world.player.addFragment(fragment);
-        world.baseMap[y][x] = MapVisuals.OPEN_DOOR; // Show open door after collecting
+        world.hiddenItems[y][x] = MapVisuals.EMPTY;
+        world.revealedItems[y][x] = MapVisuals.FRAGMENT;
+        world.baseMap[y][x] = MapVisuals.OPEN_DOOR; // Walkable after collecting
         return "Fragment collected.";
     }
 
-    private String applyMedkitAt(int x, int y) {
-        Medkit medkit = new Medkit(new Position(x, y));
+    private String collectMedkitAt(int x, int y) {
         world.player.addMedkit();
-        world.player.heal(medkit.getHealAmount());
-        world.baseMap[y][x] = MapVisuals.OPEN_DOOR; // Show open door after collecting
-        return "Medkit restored +" + medkit.getHealAmount() + " HP.";
+        world.hiddenItems[y][x] = MapVisuals.EMPTY;
+        world.revealedItems[y][x] = MapVisuals.MEDKIT;
+        world.baseMap[y][x] = MapVisuals.OPEN_DOOR; // Walkable after collecting
+        return "A medkit found. Press E to use.";
     }
 
-    private String triggerHazardAt(int x, int y) {
-        world.hazardsTriggeredCount++;
-        world.baseMap[y][x] = MapVisuals.OPEN_DOOR; // Show open door after triggering hazard
-        world.player.takeDamage(80);
-        return "Hazard triggered! -80 HP.";
+    private String triggerTrapAt(int x, int y) {
+        world.trapsTriggeredCount++;
+        world.hiddenItems[y][x] = MapVisuals.EMPTY;
+        world.revealedItems[y][x] = MapVisuals.TRAP;
+        world.baseMap[y][x] = MapVisuals.OPEN_DOOR; // Walkable after triggering trap
+        Trap trap = new Trap(new Position(x, y));
+        world.player.takeDamage(trap.getDamage());
+        return "Trap triggered! -" + trap.getDamage() + " HP.";
+    }
+
+    private String useMedkitFromInventory() {
+        int healed = world.player.useMedkit();
+        if (healed > 0) {
+            return "Medkit used. +" + healed + " HP.";
+        }
+        return "No medkits available.";
+    }
+
+    private String triggerDroneSpawnAt(int doorX, int doorY) {
+        world.baseMap[doorY][doorX] = MapVisuals.OPEN_DOOR;
+        world.hiddenItems[doorY][doorX] = MapVisuals.EMPTY;
+        world.revealedItems[doorY][doorX] = MapVisuals.EMPTY;
+        Position spawn = findRandomSpawnPosition();
+        if (spawn == null) {
+            return "Empty room triggered, but no space for a new drone.";
+        }
+        world.drones.add(new Drone(spawn));
+        return "Empty room triggered a new drone!";
+    }
+
+    private Position findRandomSpawnPosition() {
+        List<Position> possibles = new ArrayList<>();
+        for (int y = 0; y < Constants.MAP_SIZE; y++) {
+            for (int x = 0; x < Constants.MAP_SIZE; x++) {
+                if (canSpawnDroneAt(x, y)) {
+                    possibles.add(new Position(x, y));
+                }
+            }
+        }
+        if (possibles.isEmpty()) {
+            return null;
+        }
+        return possibles.get(random.nextInt(possibles.size()));
+    }
+
+    private boolean canSpawnDroneAt(int x, int y) {
+        if (!isWithinBounds(x, y)) {
+            return false;
+        }
+        int tile = world.baseMap[y][x];
+        if (tile == MapVisuals.WALL || tile == MapVisuals.EXIT || tile == MapVisuals.DOOR) {
+            return false;
+        }
+        if (world.player.getPosition().getX() == x && world.player.getPosition().getY() == y) {
+            return false;
+        }
+        for (Drone drone : world.drones) {
+            if (drone.isActive()) {
+                Position pos = drone.getPosition();
+                if (pos.getX() == x && pos.getY() == y) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     private boolean hasCollectedAllFragments() {
@@ -269,6 +373,7 @@ public class GameEngine implements Runnable {
         if (world.drones.isEmpty())
             return 0;
 
+        // deals multiple damage
         int totalDamage = 0;
         for (Drone drone : world.drones) {
             if (!drone.isActive())
@@ -299,9 +404,9 @@ public class GameEngine implements Runnable {
 
     private GameSnapshot buildSnapshot() {
         // tiles
-        int[][] tiles = new int[GameFactory.World.MAP_SIZE][GameFactory.World.MAP_SIZE];
-        for (int y = 0; y < GameFactory.World.MAP_SIZE; y++) {
-            System.arraycopy(world.map[y], 0, tiles[y], 0, GameFactory.World.MAP_SIZE);
+        int[][] tiles = new int[Constants.MAP_SIZE][Constants.MAP_SIZE];
+        for (int y = 0; y < Constants.MAP_SIZE; y++) {
+            System.arraycopy(world.map[y], 0, tiles[y], 0, Constants.MAP_SIZE);
         }
 
         return new GameSnapshot(
@@ -313,7 +418,7 @@ public class GameEngine implements Runnable {
                 world.fragmentsCollected(),
                 world.totalFragmentsRequired,
                 world.dronesTriggeredCount,
-                world.hazardsTriggeredCount,
+                world.trapsTriggeredCount,
                 world.elapsedMillis(),
                 lastMessage);
     }

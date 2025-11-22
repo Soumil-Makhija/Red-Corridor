@@ -4,17 +4,11 @@ import com.team12.redCorridor.utils.Constants;
 
 // This class represents a healing item called a Medkit
 public class Medkit {
-
-    // The position of the medkit on the map
-    private Position position;
-
     // How much health the medkit restores when used
     private int healAmount;
 
     // Constructor: sets where the medkit is and how much it heals
     public Medkit(Position position) {
-        this.position = position;
-
         // The healing amount is stored in the Constants class
         this.healAmount = Constants.MEDKIT_HEAL_AMOUNT;
     }

@@ -9,6 +9,7 @@ import com.team12.redCorridor.engine.GameFactory;
 import com.team12.redCorridor.engine.GameSnapshot;
 import com.team12.redCorridor.engine.GameState;
 import com.team12.redCorridor.engine.InputHandler;
+import com.team12.redCorridor.engine.World;
 import com.team12.redCorridor.ui.util.MapVisuals;
 import com.team12.redCorridor.utils.Constants;
 
@@ -20,7 +21,6 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 /**
@@ -95,6 +95,10 @@ public class GameSceneController extends Controller {
                     if (input != null)
                         input.release(Direction.RIGHT);
                 }
+                case E -> {
+                    if (input != null)
+                        input.requestMedkitUse();
+                }
                 default -> {
                 }
             }
@@ -121,7 +125,7 @@ public class GameSceneController extends Controller {
     }
 
     private void startEngine() {
-        GameFactory.World world = new GameFactory().createDefaultWorld();
+        World world = new GameFactory().createDefaultWorld();
         input = new InputHandler();
         engine = new GameEngine(world, input, new EngineListener() {
             @Override
@@ -202,6 +206,7 @@ public class GameSceneController extends Controller {
 
     // switch to win/defeat scene
     private void showSummaryScene(String resource) {
+        int[][] revealedMap = buildRevealedMap();
         stopEngine();
 
         Stage currentStage = stage != null ? stage : getPrimaryStage();
@@ -220,12 +225,16 @@ public class GameSceneController extends Controller {
             summaryController.recordKey(summaryScene);
 
             if (lastSnapshot != null) {
-                summaryController.setMapData(lastSnapshot.tiles());
+                if (revealedMap != null) {
+                    summaryController.setMapData(revealedMap);
+                } else {
+                    summaryController.setMapData(lastSnapshot.tiles());
+                }
                 summaryController.setStats(new SummaryStats(
                         lastSnapshot.fragmentsCollected(),
                         lastSnapshot.fragmentsRequired(),
                         lastSnapshot.dronesTriggered(),
-                        lastSnapshot.hazardsTriggered(),
+                        lastSnapshot.trapsTriggered(),
                         lastSnapshot.elapsedMillis(),
                         lastSnapshot.hp()));
             }
@@ -242,6 +251,28 @@ public class GameSceneController extends Controller {
             engine.stop();
             engine = null;
         }
+    }
+
+    private int[][] buildRevealedMap() {
+        if (engine == null) {
+            return null;
+        }
+        World world = engine.getWorld();
+        if (world == null) {
+            return null;
+        }
+        int size = Constants.MAP_SIZE;
+        int[][] revealed = new int[size][size];
+        for (int y = 0; y < size; y++) {
+            System.arraycopy(world.map[y], 0, revealed[y], 0, size);
+            for (int x = 0; x < size; x++) {
+                int hidden = world.hiddenItems[y][x];
+                if (hidden != MapVisuals.EMPTY) {
+                    revealed[y][x] = hidden;
+                }
+            }
+        }
+        return revealed;
     }
 
     // get minutes and seconds from milliseconds

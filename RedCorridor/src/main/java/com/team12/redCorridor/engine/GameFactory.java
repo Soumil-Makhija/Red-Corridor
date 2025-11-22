@@ -10,6 +10,7 @@ import com.team12.redCorridor.entities.Drone;
 import com.team12.redCorridor.entities.Player;
 import com.team12.redCorridor.entities.Position;
 import com.team12.redCorridor.ui.util.MapVisuals;
+import com.team12.redCorridor.utils.Constants;
 
 /**
  * Builds the world by loading one of the authored mazes (15x15 with 13x13
@@ -17,65 +18,26 @@ import com.team12.redCorridor.ui.util.MapVisuals;
  * tiles.
  */
 public class GameFactory {
-    private static final int MAP_SIZE = 15;
-    private static final int FRAGMENT_COUNT = 6;
-    private static final int MEDKIT_COUNT = 4;
-    private static final int DRONE_COUNT = 6;
-
     private final MazeLoader mazeLoader = new MazeLoader();
     private final Random random = new Random();
 
-    /**
-     * Complete world state the engine mutates.
-     */
-    public static class World {
-        public static final int MAP_SIZE = GameFactory.MAP_SIZE;
-
-        public final int[][] baseMap = new int[MAP_SIZE][MAP_SIZE];
-        public final int[][] map = new int[MAP_SIZE][MAP_SIZE];
-        public final int[][] hiddenItems = new int[MAP_SIZE][MAP_SIZE]; // Track what's behind doors
-        public final List<Drone> drones = new ArrayList<>();
-        public Player player;
-
-        public int totalFragmentsRequired;
-        public int dronesTriggeredCount;
-        public int hazardsTriggeredCount;
-        public long startTimeMillis;
-
-        public int hp() {
-            return player != null ? player.getHealth() : 0;
-        }
-
-        public int medkits() {
-            return player != null ? player.getMedkitCount() : 0;
-        }
-
-        public int fragmentsCollected() {
-            return player != null ? player.getFragmentCount() : 0;
-        }
-
-        public long elapsedMillis() {
-            return startTimeMillis > 0 ? System.currentTimeMillis() - startTimeMillis : 0;
-        }
-    }
-
+    // main world
     public World createDefaultWorld() {
         World world = new World();
 
         char[][] layout = mazeLoader.loadRandomMaze();
         List<Position> openTiles = new ArrayList<>();
-        List<Position> lockerTiles = new ArrayList<>();
-        applyLayout(world, layout, openTiles, lockerTiles);
+        applyLayout(world, layout, openTiles);
 
-        configureWorld(world, openTiles, lockerTiles);
+        configureWorld(world, openTiles);
         refreshDynamicMap(world);
         return world;
     }
 
-    private void applyLayout(World world, char[][] layout, List<Position> openTiles, List<Position> lockerTiles) {
-        for (int y = 0; y < MAP_SIZE; y++) {
-            for (int x = 0; x < MAP_SIZE; x++) {
-                boolean edge = (x == 0 || y == 0 || x == MAP_SIZE - 1 || y == MAP_SIZE - 1);
+    private void applyLayout(World world, char[][] layout, List<Position> openTiles) {
+        for (int y = 0; y < Constants.MAP_SIZE; y++) {
+            for (int x = 0; x < Constants.MAP_SIZE; x++) {
+                boolean edge = (x == 0 || y == 0 || x == Constants.MAP_SIZE - 1 || y == Constants.MAP_SIZE - 1);
                 boolean wall = edge;
                 if (!edge) {
                     char value = layout[y][x];
@@ -87,10 +49,6 @@ public class GameFactory {
                         }
                         Position pos = new Position(x, y);
                         openTiles.add(pos);
-                        if (value == 'R') {
-                            world.baseMap[y][x] = MapVisuals.DOOR;
-                            lockerTiles.add(pos);
-                        }
                     }
                 }
                 world.baseMap[y][x] = wall ? MapVisuals.WALL : MapVisuals.EMPTY;
@@ -98,63 +56,38 @@ public class GameFactory {
         }
     }
 
-    private void configureWorld(World world, List<Position> openTiles, List<Position> roomTiles) {
+    private void configureWorld(World world, List<Position> openTiles) {
         if (openTiles.isEmpty()) {
             throw new IllegalStateException("Maze does not contain any playable tiles.");
         }
 
-        Position start = chooseStart(roomTiles, openTiles);
+        GameMode mode = GameSettings.getCurrentMode();
+
+        Position start = copy(findClosestToCenter(openTiles));
         world.player = new Player(new Position(start.getX(), start.getY()));
         removePosition(openTiles, start);
-        removePosition(roomTiles, start);
 
         // Remove any tiles already marked as exit
         openTiles.removeIf(pos -> world.baseMap[pos.getY()][pos.getX()] == MapVisuals.EXIT);
-
-        Position hazard = chooseFarthest(openTiles, start);
-        if (hazard != null) {
-            world.hiddenItems[hazard.getY()][hazard.getX()] = MapVisuals.DANGER;
-            world.baseMap[hazard.getY()][hazard.getX()] = MapVisuals.DOOR; // Show as closed door initially
-            removePosition(openTiles, hazard);
-        }
 
         List<Position> placementPool = new ArrayList<>(openTiles);
         Collections.shuffle(placementPool, random);
 
         int fragmentsPlaced = placeHiddenTiles(placementPool, world.baseMap, world.hiddenItems, MapVisuals.FRAGMENT,
-                FRAGMENT_COUNT);
-        placeHiddenTiles(placementPool, world.baseMap, world.hiddenItems, MapVisuals.MEDKIT, MEDKIT_COUNT);
-        spawnDrones(world, placementPool, DRONE_COUNT);
+                mode.fragments());
+        placeHiddenTiles(placementPool, world.baseMap, world.hiddenItems, MapVisuals.MEDKIT, mode.medkits());
+        placeHiddenTiles(placementPool, world.baseMap, world.hiddenItems, MapVisuals.TRAP, mode.traps());
+        placeHiddenTiles(placementPool, world.baseMap, world.hiddenItems, MapVisuals.DRONE_TRIGGER,
+                mode.droneRooms());
+        placeHiddenTiles(placementPool, world.baseMap, world.hiddenItems, MapVisuals.EMPTY, mode.emptyRooms());
+        spawnDrones(world, placementPool, mode.drones());
 
         world.totalFragmentsRequired = fragmentsPlaced;
         world.startTimeMillis = System.currentTimeMillis();
     }
 
-    private Position chooseStart(List<Position> roomTiles, List<Position> fallback) {
-        if (!roomTiles.isEmpty()) {
-            return copy(findClosestToCenter(roomTiles));
-        }
-        return copy(findClosestToCenter(fallback));
-    }
-
-    private Position chooseFarthest(List<Position> candidates, Position reference) {
-        if (candidates.isEmpty() || reference == null) {
-            return null;
-        }
-        Position farthest = candidates.get(0);
-        int bestDistance = -1;
-        for (Position pos : candidates) {
-            int dist = distanceSquared(pos, reference);
-            if (dist > bestDistance) {
-                bestDistance = dist;
-                farthest = pos;
-            }
-        }
-        return copy(farthest);
-    }
-
     private Position findClosestToCenter(List<Position> candidates) {
-        int center = MAP_SIZE / 2;
+        int center = Constants.MAP_SIZE / 2;
         return Collections.min(candidates, Comparator.comparingInt(p -> distanceSquared(p, center, center)));
     }
 
@@ -191,10 +124,6 @@ public class GameFactory {
         }
     }
 
-    private int distanceSquared(Position pos, Position reference) {
-        return distanceSquared(pos, reference.getX(), reference.getY());
-    }
-
     private int distanceSquared(Position pos, int targetX, int targetY) {
         int dx = pos.getX() - targetX;
         int dy = pos.getY() - targetY;
@@ -202,8 +131,16 @@ public class GameFactory {
     }
 
     public static void refreshDynamicMap(World world) {
-        for (int y = 0; y < World.MAP_SIZE; y++) {
-            System.arraycopy(world.baseMap[y], 0, world.map[y], 0, World.MAP_SIZE);
+        for (int y = 0; y < Constants.MAP_SIZE; y++) {
+            System.arraycopy(world.baseMap[y], 0, world.map[y], 0, Constants.MAP_SIZE);
+            for (int x = 0; x < Constants.MAP_SIZE; x++) {
+                if (world.baseMap[y][x] == MapVisuals.OPEN_DOOR) {
+                    int revealed = world.revealedItems[y][x];
+                    if (revealed != MapVisuals.EMPTY) {
+                        world.map[y][x] = revealed;
+                    }
+                }
+            }
         }
 
         for (Drone drone : world.drones) {

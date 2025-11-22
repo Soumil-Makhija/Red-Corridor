@@ -51,6 +51,7 @@
                   <Label alignment="CENTER" prefHeight="17.0" prefWidth="53.0" text="[L]obby" wrapText="true" VBox.vgrow="ALWAYS" />
                   <Label alignment="CENTER" layoutX="213.0" layoutY="41.0" prefHeight="17.0" prefWidth="53.0" text="[B]ack" wrapText="true" />
                   <Label alignment="CENTER" prefHeight="17.0" prefWidth="47.0" text="[Q]uit" wrapText="true" VBox.vgrow="ALWAYS" />
+                  <Label alignment="CENTER" layoutX="216.0" layoutY="91.0" prefHeight="17.0" prefWidth="89.0" text="[E]quip Med" wrapText="true" />
                </children>
             </VBox>
             <VBox alignment="TOP_CENTER" nodeOrientation="LEFT_TO_RIGHT" spacing="8.0">
@@ -73,6 +74,9 @@
                                        <image>
                                           <Image url="@../icons/open-door.png" />
                                        </image>
+                                       <HBox.margin>
+                                          <Insets left="1.0" />
+                                       </HBox.margin>
                                     </ImageView>
                                     <Label alignment="CENTER" prefHeight="34.0" prefWidth="80.0" text="Open Door" />
                                  </children>
@@ -93,6 +97,9 @@
                                        <image>
                                           <Image url="@../icons/exit.png" />
                                        </image>
+                                       <HBox.margin>
+                                          <Insets left="3.0" />
+                                       </HBox.margin>
                                     </ImageView>
                                     <Label alignment="CENTER" prefHeight="34.0" prefWidth="78.0" text="Exit" />
                                  </children>
@@ -104,30 +111,39 @@
                            <children>
                               <HBox>
                                  <children>
-                                    <ImageView fitHeight="34.0" fitWidth="46.0" pickOnBounds="true">
+                                    <ImageView fitHeight="34.0" fitWidth="39.0" pickOnBounds="true">
                                        <image>
                                           <Image url="@../icons/hazard.png" />
                                        </image>
+                                       <HBox.margin>
+                                          <Insets left="1.0" />
+                                       </HBox.margin>
                                     </ImageView>
                                     <Label alignment="CENTER" prefHeight="34.0" prefWidth="69.0" text="Radiation" />
                                  </children>
                               </HBox>
                               <HBox>
                                  <children>
-                                    <ImageView fitHeight="34.0" fitWidth="46.0" pickOnBounds="true">
+                                    <ImageView fitHeight="34.0" fitWidth="32.0" pickOnBounds="true">
                                        <image>
                                           <Image url="@../icons/fragment.png" />
                                        </image>
+                                       <HBox.margin>
+                                          <Insets left="5.0" />
+                                       </HBox.margin>
                                     </ImageView>
                                     <Label alignment="CENTER" prefHeight="34.0" prefWidth="69.0" text="Fragment" />
                                  </children>
                               </HBox>
                               <HBox>
                                  <children>
-                                    <ImageView fitHeight="34.0" fitWidth="34.0" pickOnBounds="true">
+                                    <ImageView fitHeight="34.0" fitWidth="35.0" pickOnBounds="true">
                                        <image>
                                           <Image url="@../icons/medkit.png" />
                                        </image>
+                                       <HBox.margin>
+                                          <Insets left="2.0" />
+                                       </HBox.margin>
                                     </ImageView>
                                     <Label alignment="CENTER" prefHeight="34.0" prefWidth="66.0" text="Medkit" />
                                  </children>
@@ -139,7 +155,7 @@
                            <children>
                               <HBox>
                                  <children>
-                                    <ImageView fitHeight="34.0" fitWidth="46.0" pickOnBounds="true">
+                                    <ImageView fitHeight="34.0" fitWidth="35.0" pickOnBounds="true">
                                        <image>
                                           <Image url="@../icons/drone.png" />
                                        </image>
@@ -149,7 +165,7 @@
                               </HBox>
                               <HBox layoutX="10.0" layoutY="10.0">
                                  <children>
-                                    <ImageView fitHeight="34.0" fitWidth="46.0" pickOnBounds="true">
+                                    <ImageView fitHeight="34.0" fitWidth="37.0" pickOnBounds="true">
                                        <image>
                                           <Image url="@../icons/user.png" />
                                        </image>
@@ -159,10 +175,13 @@
                               </HBox>
                               <HBox layoutX="10.0" layoutY="44.0">
                                  <children>
-                                    <ImageView fitHeight="34.0" fitWidth="46.0" pickOnBounds="true">
+                                    <ImageView fitHeight="34.0" fitWidth="36.0" pickOnBounds="true">
                                        <image>
                                           <Image url="@../icons/wall.png" />
                                        </image>
+                                       <HBox.margin>
+                                          <Insets left="1.0" />
+                                       </HBox.margin>
                                     </ImageView>
                                     <Label alignment="CENTER" prefHeight="34.0" prefWidth="53.0" text="Wall" />
                                  </children>

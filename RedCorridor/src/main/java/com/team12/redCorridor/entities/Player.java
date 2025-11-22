@@ -3,15 +3,7 @@ package com.team12.redCorridor.entities;
 import java.util.ArrayList;
 import java.util.List;
 import com.team12.redCorridor.utils.Constants;
-
-// This enum lists all possible movement directions
-// for the player. Each value represents one direction they can move in.
-enum Direction {
-    UP, // Move up (decrease Y)
-    DOWN, // Move down (increase Y)
-    LEFT, // Move left (decrease X)
-    RIGHT; // Move right (increase X)
-}
+import com.team12.redCorridor.engine.*;
 
 // This class represents the player character in the game
 public class Player {
@@ -73,11 +65,14 @@ public class Player {
     }
 
     // Uses a medkit to heal the player (if available)
-    public void useMedkit() {
+    public int useMedkit() {
         if (medkitCount > 0) {
+            int before = health;
             heal(Constants.MEDKIT_HEAL_AMOUNT); // heal by a fixed amount
             medkitCount--; // reduce medkit count by 1
+            return health - before;
         }
+        return 0;
     }
 
     // --- Getters (to safely access private values) ---
