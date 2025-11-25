@@ -30,6 +30,8 @@ public class LobbySceneController extends Controller {
     @FXML
     private Label trapsValueLabel;
     @FXML
+    private Label dronesValueLabel;
+    @FXML
     private Label droneRoomsValueLabel;
     @FXML
     private Label emptyRoomsValueLabel;
@@ -137,6 +139,7 @@ public class LobbySceneController extends Controller {
         fragmentsValueLabel.setText(String.valueOf(mode.fragments()));
         medkitsValueLabel.setText(String.valueOf(mode.medkits()));
         trapsValueLabel.setText(String.valueOf(mode.traps()));
+        dronesValueLabel.setText(String.valueOf(mode.drones()));
         droneRoomsValueLabel.setText(String.valueOf(mode.droneRooms()));
         emptyRoomsValueLabel.setText(String.valueOf(mode.emptyRooms()));
         droneDamageValueLabel.setText(String.valueOf(Constants.DRONE_DAMAGE));
