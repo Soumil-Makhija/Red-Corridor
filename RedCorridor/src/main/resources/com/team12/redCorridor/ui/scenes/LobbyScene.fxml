@@ -192,6 +192,11 @@
                               <Insets bottom="5.0" top="5.0" />
                            </padding>
                         </Label>
+                        <Label fx:id="demoModeLabel" layoutX="65.0" layoutY="116.0" text="Demo">
+                           <padding>
+                              <Insets bottom="5.0" top="5.0" />
+                           </padding>
+                        </Label>
                      </children>
                      <HBox.margin>
                         <Insets />

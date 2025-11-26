@@ -16,6 +16,8 @@ src/
 
 ## Person 1: Entities & Utils (Game Objects & Utilities)
 
+- Soumil
+
 ### Directories: `src/entities/` and `src/utils/`
 
 ### Files to Create (7 files)
@@ -74,6 +76,8 @@ src/
 
 ## Person 2: Map Package (World, Tiles, Obstacles)
 
+- Noah
+
 ### Directory: `src/map/`
 
 ### Files to Create (11 files)
@@ -123,6 +127,8 @@ src/
 
 ## Person 3: UI Package (Graphics & User Interface)
 
+- James
+
 ### Directory: `src/ui/`
 
 ### Files to Create (6 files)
@@ -167,6 +173,8 @@ src/
 ---
 
 ## Person 4: Engine (Game Systems & Integration)
+
+- Sunny
 
 ### Directory: `src/engine/` and `Main.java`
 

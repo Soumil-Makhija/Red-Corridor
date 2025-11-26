@@ -49,14 +49,16 @@ public class LobbySceneController extends Controller {
     private Label hardModeLabel;
     @FXML
     private Label extremeModeLabel;
+    @FXML
+    private Label demoModeLabel;
 
     private List<Label> modeLabels;
-    private final GameMode[] modes = { GameMode.EASY, GameMode.MEDIUM, GameMode.HARD, GameMode.EXTREME };
+    private final GameMode[] modes = { GameMode.EASY, GameMode.MEDIUM, GameMode.HARD, GameMode.EXTREME, GameMode.DEMO };
     private int selectedIndex = 1; // default choice
 
     @FXML
     public void initialize() {
-        modeLabels = List.of(easyModeLabel, mediumModeLabel, hardModeLabel, extremeModeLabel);
+        modeLabels = List.of(easyModeLabel, mediumModeLabel, hardModeLabel, extremeModeLabel, demoModeLabel);
         GameMode current = GameSettings.getCurrentMode(); // load default mode
         int idx = Arrays.asList(modes).indexOf(current);
         if (idx >= 0) {

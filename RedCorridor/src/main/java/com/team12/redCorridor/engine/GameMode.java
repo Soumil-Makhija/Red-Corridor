@@ -7,7 +7,8 @@ public enum GameMode {
     EASY("Easy", 6, 6, 2, 6, 0, 3),
     MEDIUM("Medium", 6, 6, 2, 5, 4, 5),
     HARD("Hard", 6, 6, 3, 5, 4, 5),
-    EXTREME("Extreme", 6, 6, 4, 4, 4, 6);
+    EXTREME("Extreme", 6, 6, 4, 4, 4, 6),
+    DEMO("Demo", 2, 2, 1, 1, 1, 2);
 
     private final String displayName;
     private final int fragments;
