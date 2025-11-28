@@ -1,11 +1,11 @@
 Red Corridor
 
-Red Corridor is a top down sci-fi maze escape game in which the player navigates a series of 
+  Red Corridor is a top down sci-fi maze escape game in which the player navigates a series of 
 interconnected rooms, avoids hazards, and reaches the exit before being caught. 
 The game is built using Java, JavaFX, and Maven.
 
 Description:
-Red Corridor is a modular and test driven JavaFX game focused on movement, navigation, and 
+  Red Corridor is a modular and test driven JavaFX game focused on movement, navigation, and 
 timing. The player explores maze based rooms filled with enemies and traps, while the game 
 engine handles movement, collision detection, path loading, and rendering. The project includes 
 a complete JavaFX interface, automated tests, a game engine package, and Maven generated artifacts 
@@ -63,6 +63,6 @@ A JaCoCo code coverage report is automatically generated in:
   - target/site/jacoco/index.html
 
 Gameplay Overview:
-Players move using W, A, S, D, or the arrow keys. The objective is to navigate through the maze, 
+  Players move using W, A, S, D, or the arrow keys. The objective is to navigate through the maze, 
 avoid enemies and environmental hazards, and reach the exit room. Colliding with an enemy results 
 in game over. Maze layouts, scenes, and icons are located in the project’s main resources directory.
