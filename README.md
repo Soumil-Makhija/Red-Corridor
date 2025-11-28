@@ -1,3 +1,5 @@
+Red Corridor
+
 Red Corridor is a top down sci-fi maze escape game in which the player navigates a series of 
 interconnected rooms, avoids hazards, and reaches the exit before being caught. 
 The game is built using Java, JavaFX, and Maven.
