@@ -66,3 +66,8 @@ Gameplay Overview:
   Players move using W, A, S, D, or the arrow keys. The objective is to navigate through the maze, 
 avoid enemies and environmental hazards, and reach the exit room. Colliding with an enemy results 
 in game over. Maze layouts, scenes, and icons are located in the project’s main resources directory.
+  
+
+Tutorial Video Link:
+https://drive.google.com/file/d/10E-K-Jd5Qw11IhDcKS6pJzEomj2RDH3x/view?usp=sharing
+  
