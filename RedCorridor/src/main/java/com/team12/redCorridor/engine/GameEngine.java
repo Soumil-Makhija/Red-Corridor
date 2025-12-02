@@ -274,8 +274,7 @@ public class GameEngine implements Runnable {
     }
 
     private String collectFragmentAt(int x, int y) {
-        KeyFragment fragment = new KeyFragment(new Position(x, y));
-        fragment.collect();
+        KeyFragment fragment = new KeyFragment();
         world.player.addFragment(fragment);
         world.hiddenItems[y][x] = MapVisuals.EMPTY;
         world.revealedItems[y][x] = MapVisuals.FRAGMENT;

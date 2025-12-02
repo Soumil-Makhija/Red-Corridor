@@ -66,14 +66,12 @@ public class PlayerTest {
         Player player = createDefaultPlayerAt(0, 0);
         assertEquals(0, player.getFragmentCount());
 
-        KeyFragment fragment1 = new KeyFragment(new Position(1, 1));
-        fragment1.collect();
+        KeyFragment fragment1 = new KeyFragment();
         player.addFragment(fragment1);
 
         assertEquals(1, player.getFragmentCount());
 
-        KeyFragment fragment2 = new KeyFragment(new Position(2, 2));
-        fragment2.collect();
+        KeyFragment fragment2 = new KeyFragment();
         player.addFragment(fragment2);
 
         assertEquals(2, player.getFragmentCount());
