@@ -132,16 +132,51 @@ public class LobbySceneController extends Controller {
     }
 
     // update world settings
-    private void updateConfigLabels(GameMode mode) {
+    private void updateMapSize() {
         mapSizeValueLabel.setText(String.valueOf(Constants.MAP_SIZE));
+    }
+    
+    private void updateFragments(GameMode mode) {
         fragmentsValueLabel.setText(String.valueOf(mode.fragments()));
+    }
+    
+    private void updateMedkits(GameMode mode) {
         medkitsValueLabel.setText(String.valueOf(mode.medkits()));
+    }
+    
+    private void updateTraps(GameMode mode) {
         trapsValueLabel.setText(String.valueOf(mode.traps()));
+    }
+    
+    private void updateDroneRooms(GameMode mode) {
         droneRoomsValueLabel.setText(String.valueOf(mode.droneRooms()));
+    }
+    
+    private void updateEmptyRooms(GameMode mode) {
         emptyRoomsValueLabel.setText(String.valueOf(mode.emptyRooms()));
+    }
+    
+    private void updateDroneDamage() {
         droneDamageValueLabel.setText(String.valueOf(Constants.DRONE_DAMAGE));
+    }
+    
+    private void updateTrapDamage() {
         trapDamageValueLabel.setText(String.valueOf(Constants.DAMAGE));
+    }
+    
+    private void updateMedkitHeal() {
         medkitHealValueLabel.setText(String.valueOf(Constants.MEDKIT_HEAL_AMOUNT));
+    }
+    private void updateConfigLabels(GameMode mode) {
+        updateMapSize();
+        updateFragments(mode);
+        updateMedkits(mode);
+        updateTraps(mode);
+        updateDroneRooms(mode);
+        updateEmptyRooms(mode);
+        updateDroneDamage();
+        updateTrapDamage();
+        updateMedkitHeal();
     }
 
     private void startSelectedMode(KeyEvent event) {
