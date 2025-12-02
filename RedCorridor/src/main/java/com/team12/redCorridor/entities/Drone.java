@@ -8,8 +8,8 @@ public class Drone {
     // The drone's current position on the map
     private Position position;
 
-    // How much damage the drone can cause
-    private int damage;
+    // Refactor (S4, S9): Use Damage value object for drone damage
+    private Damage damage;
 
     // Whether the drone is still active (not destroyed)
     private boolean active;
@@ -17,13 +17,8 @@ public class Drone {
     // Constructor is called when we create a new Drone
     // It sets the starting position, damage, and marks it as active
     public Drone(Position startPosition) {
-        // Set the drone's starting position
         this.position = startPosition;
-
-        // Set the amount of damage it does (value from the Constants class)
-        this.damage = Constants.DRONE_DAMAGE;
-
-        // The drone starts as active by default
+        this.damage = new Damage(Constants.DRONE_DAMAGE);
         this.active = true;
     }
 
@@ -68,6 +63,6 @@ public class Drone {
     } // Get current position
 
     public int getDamage() {
-        return damage;
+        return damage.getValue();
     } // Get how much damage it can deal
 }

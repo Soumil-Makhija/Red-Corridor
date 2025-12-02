@@ -11,9 +11,9 @@ public class Player {
     // The player's current position on the map
     private Position position;
 
-    // The player's current and maximum health
-    private int health;
-    private int maxHealth;
+    // Refactor (S4, S9): Use Health value object to encapsulate health and
+    // maxHealth
+    private Health health;
 
     // A list to store all collected key fragments
     private List<KeyFragment> fragments;
@@ -22,12 +22,13 @@ public class Player {
     private static int medkitCount;
 
     // Constructor: sets up the player when the game starts
+    // Refactor (S4, S9): Accepts Position and creates Health with max from
+    // Constants
     public Player(Position startPosition) {
         this.position = startPosition;
-        this.maxHealth = Constants.PLAYER_MAX_HEALTH; // set from Constants class
-        this.health = maxHealth; // start with full health
-        this.fragments = new ArrayList<>(); // empty list for fragments
-        medkitCount = 0; // start with no medkits
+        this.health = new Health(Constants.PLAYER_MAX_HEALTH);
+        this.fragments = new ArrayList<>();
+        medkitCount = 0;
     }
 
     // Moves the player one step in the chosen direction
@@ -44,14 +45,13 @@ public class Player {
         }
     }
 
-    // Increases the player's health but not above maxHealth
+    // Refactor (S4, S9): Use Health methods for healing and damage
     public void heal(int amount) {
-        health = Math.min(maxHealth, health + amount);
+        health.increase(amount);
     }
 
-    // Reduces the player's health but not below zero
     public void takeDamage(int amount) {
-        health = Math.max(0, health - amount);
+        health.decrease(amount);
     }
 
     // Adds a collected key fragment to the player's inventory
@@ -67,10 +67,10 @@ public class Player {
     // Uses a medkit to heal the player (if available)
     public int useMedkit() {
         if (medkitCount > 0) {
-            int before = health;
-            heal(Constants.MEDKIT_HEAL_AMOUNT); // heal by a fixed amount
-            medkitCount--; // reduce medkit count by 1
-            return health - before;
+            int before = health.getValue();
+            heal(Constants.MEDKIT_HEAL_AMOUNT);
+            medkitCount--;
+            return health.getValue() - before;
         }
         return 0;
     }
@@ -81,7 +81,7 @@ public class Player {
     }
 
     public int getHealth() {
-        return health;
+        return health.getValue();
     }
 
     public int getFragmentCount() {
