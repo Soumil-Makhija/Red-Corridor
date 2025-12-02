@@ -141,6 +141,13 @@ public class GameSceneController extends Controller {
         engine.start();
         updateStaticHud();
     }
+    
+    private void redrawMap() {
+        if (graphicsContext != null && lastSnapshot != null) {
+            MapVisuals.draw(graphicsContext, lastSnapshot.tiles());
+        }
+    }
+    
 
     private void updateHealth(GameSnapshot s) {
         hpLabel.setText("HP: " + s.hp() + "/" + Constants.PLAYER_MAX_HEALTH);
@@ -166,9 +173,8 @@ public class GameSceneController extends Controller {
     }
     
     private void drawSnapshot(GameSnapshot s) {
-        if (graphicsContext != null) {
-            MapVisuals.draw(graphicsContext, s.tiles());
-        }
+        lastSnapshot = s;
+        redrawMap();
     }
     
 
@@ -202,9 +208,7 @@ public class GameSceneController extends Controller {
         canvas.setWidth(width);
         canvas.setHeight(height);
 
-        if (graphicsContext != null && lastSnapshot != null) {
-            MapVisuals.draw(graphicsContext, lastSnapshot.tiles());
-        }
+        redrawMap();
     }
 
     private void updateStaticHud() {
