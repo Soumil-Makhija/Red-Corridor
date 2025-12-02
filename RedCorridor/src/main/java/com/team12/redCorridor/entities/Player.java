@@ -18,8 +18,8 @@ public class Player {
     // S1: Bad Naming - Rename to keyFragments
     private List<KeyFragment> keyFragments;
 
-    // S1: Bad Naming - Rename to medkits
-    private int medkits;
+    // S6: Low Cohesion - Extract medkit logic to MedkitInventory
+    private MedkitInventory medkitInventory;
 
     // Constructor: sets up the player when the game starts
     // Refactor (S4, S9): Accepts Position and creates Health with max from
@@ -29,7 +29,7 @@ public class Player {
         this.position = startPosition;
         this.health = new Health(Constants.PLAYER_MAX_HEALTH);
         this.keyFragments = new ArrayList<>();
-        this.medkits = 0;
+        this.medkitInventory = new MedkitInventory(); // S6
     }
 
     // Moves the player one step in the chosen direction
@@ -62,18 +62,15 @@ public class Player {
 
     // S1: Bad Naming - collectMedkit
     public void collectMedkit() {
-        medkits++;
+        // S6: Delegate to MedkitInventory
+        medkitInventory.collectMedkit();
     }
 
     // S1: Bad Naming - consumeMedkit
     public int consumeMedkit() {
-        if (medkits > 0) {
-            int before = health.getValue();
-            heal(Constants.MEDKIT_HEAL_AMOUNT);
-            medkits--;
-            return health.getValue() - before;
-        }
-        return 0;
+        // S6: Delegate to MedkitInventory
+        int healed = medkitInventory.consumeMedkit(health);
+        return healed;
     }
 
     // --- Getters (to safely access private values) ---
@@ -91,6 +88,7 @@ public class Player {
     }
 
     public int getMedkitCount() {
-        return medkits;
+        // S6: Delegate to MedkitInventory
+        return medkitInventory.getMedkitCount();
     }
 }
