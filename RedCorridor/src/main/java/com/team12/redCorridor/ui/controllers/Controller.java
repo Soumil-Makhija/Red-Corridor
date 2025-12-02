@@ -15,6 +15,7 @@ import javafx.stage.Stage;
 public abstract class Controller {
     protected Stage stage;
     private static Stage primaryStage;
+    private String PATH = "/com/team12/redCorridor/ui/scenes/HelpScene.fxml";
 
     public void setStage(Stage stage) {
         this.stage = stage;
@@ -49,7 +50,7 @@ public abstract class Controller {
         try {
             // getting scene
             FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/com/team12/redCorridor/ui/scenes/HelpScene.fxml"));
+                    getClass().getResource(PATH));
             Parent root = loader.load();
 
             HelpSceneController controller = loader.getController();
