@@ -296,8 +296,9 @@ public class GameEngine implements Runnable {
         world.revealedItems[y][x] = MapVisuals.TRAP;
         world.baseMap[y][x] = MapVisuals.OPEN_DOOR; // Walkable after triggering trap
         Trap trap = new Trap(new Position(x, y));
-        world.player.takeDamage(trap.getDamage());
-        return "Trap triggered! -" + trap.getDamage() + " HP.";
+        int trapDamage = trap.getDamage().getValue(); // S10: Use Damage value object
+        world.player.takeDamage(trapDamage);
+        return "Trap triggered! -" + trapDamage + " HP.";
     }
 
     private String useMedkitFromInventory() {

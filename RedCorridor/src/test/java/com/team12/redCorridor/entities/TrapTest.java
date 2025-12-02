@@ -14,6 +14,6 @@ public class TrapTest {
         Trap trap = new Trap(pos);
 
         assertSame(pos, trap.getPosition());
-        assertEquals(Constants.DAMAGE, trap.getDamage());
+        assertEquals(Constants.DAMAGE, trap.getDamage().getValue()); // S10: Compare Damage value
     }
 }

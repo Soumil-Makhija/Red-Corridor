@@ -7,16 +7,18 @@ import com.team12.redCorridor.utils.Constants;
  */
 public class Trap {
     private final Position position;
+    private final Damage damage;
 
     public Trap(Position position) {
         this.position = position;
+        this.damage = new Damage(Constants.DAMAGE);
     }
 
     public Position getPosition() {
         return position;
     }
 
-    public int getDamage() {
-        return Constants.DAMAGE;
+    public Damage getDamage() {
+        return damage;
     }
 }
