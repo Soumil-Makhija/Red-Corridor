@@ -142,36 +142,48 @@ public class GameSceneController extends Controller {
         updateStaticHud();
     }
 
-    private void renderSnapshot(GameSnapshot snapshot) {
-        lastSnapshot = snapshot;
-
-        if (graphicsContext != null && snapshot != null) {
-            MapVisuals.draw(graphicsContext, snapshot.tiles());
-        }
-
-        if (snapshot == null) {
-            return;
-        }
-
-        if (hpLabel != null) {
-            hpLabel.setText("HP: " + snapshot.hp() + "/" + Constants.PLAYER_MAX_HEALTH);
-        }
-        if (medkitLabel != null) {
-            medkitLabel.setText("Medkits: " + snapshot.medkits());
-        }
-        if (fragmentsLabel != null) {
-            String fragmentProgress = snapshot.fragmentsRequired() > 0
-                    ? snapshot.fragmentsCollected() + "/" + snapshot.fragmentsRequired()
-                    : String.valueOf(snapshot.fragmentsCollected());
-            fragmentsLabel.setText("Fragments: " + fragmentProgress);
-        }
-        if (timeLabel != null) {
-            timeLabel.setText("Time: " + formatElapsedTime(snapshot.elapsedMillis()));
-        }
-        if (messageLabel != null && snapshot.message() != null) {
-            messageLabel.setText(snapshot.message());
+    private void updateHealth(GameSnapshot s) {
+        hpLabel.setText("HP: " + s.hp() + "/" + Constants.PLAYER_MAX_HEALTH);
+    }
+    
+    private void updateMedkits(GameSnapshot s) {
+        medkitLabel.setText("Medkits: " + s.medkits());
+    }
+    
+    private void updateFragments(GameSnapshot s) {
+        String fragmentProgress = s.fragmentsRequired() > 0
+                ? s.fragmentsCollected() + "/" + s.fragmentsRequired()
+                : String.valueOf(s.fragmentsCollected());
+        fragmentsLabel.setText("Fragments: " + fragmentProgress);
+    }
+    
+    private void updateTime(GameSnapshot s) {
+        timeLabel.setText("Time: " + formatElapsedTime(s.elapsedMillis()));
+    }
+    
+    private void updateMessage(GameSnapshot s) {
+        if (s.message() != null) messageLabel.setText(s.message());
+    }
+    
+    private void drawSnapshot(GameSnapshot s) {
+        if (graphicsContext != null) {
+            MapVisuals.draw(graphicsContext, s.tiles());
         }
     }
+    
+
+    private void renderSnapshot(GameSnapshot snapshot) {
+        if (snapshot == null) return;
+    
+        lastSnapshot = snapshot;
+        drawSnapshot(snapshot);
+        updateHealth(snapshot);
+        updateMedkits(snapshot);
+        updateFragments(snapshot);
+        updateTime(snapshot);
+        updateMessage(snapshot);
+    }
+    
 
     private void handleStateChange(GameState state) {
         if (state == GameState.GAME_OVER) {
