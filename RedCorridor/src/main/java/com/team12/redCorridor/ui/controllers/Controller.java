@@ -15,8 +15,10 @@ import javafx.stage.Stage;
 public abstract class Controller {
     protected Stage stage;
     private static Stage primaryStage;
-    private String PATH = "/com/team12/redCorridor/ui/scenes/HelpScene.fxml";
-
+    private String PATH_HELP_SCENE = "/com/team12/redCorridor/ui/scenes/HelpScene.fxml";
+    private String PATH_LOBBY_SCENE = "/com/team12/redCorridor/ui/scenes/LobbyScene.fxml";
+    private String PATH_GAME_SCENE = "/com/team12/redCorridor/ui/scenes/GameScene.fxml";
+    
     public void setStage(Stage stage) {
         this.stage = stage;
         if (primaryStage == null && stage != null) {
@@ -50,7 +52,7 @@ public abstract class Controller {
         try {
             // getting scene
             FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource(PATH));
+                    getClass().getResource(PATH_HELP_SCENE));
             Parent root = loader.load();
 
             HelpSceneController controller = loader.getController();
@@ -88,7 +90,7 @@ public abstract class Controller {
         try {
             // get lobby scene
             FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/com/team12/redCorridor/ui/scenes/LobbyScene.fxml"));
+                    getClass().getResource(PATH_LOBBY_SCENE));
             Parent root = loader.load();
             LobbySceneController lobbyController = loader.getController(); // get controller
             Scene lobbyScene = new Scene(root);
@@ -111,7 +113,7 @@ public abstract class Controller {
         try {
             // get game scene
             FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/com/team12/redCorridor/ui/scenes/GameScene.fxml"));
+                    getClass().getResource(PATH_GAME_SCENE));
 
             Parent root = loader.load();
             GameSceneController controller = loader.getController(); // game scene controller
