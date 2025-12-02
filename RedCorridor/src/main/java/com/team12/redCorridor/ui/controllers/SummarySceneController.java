@@ -57,15 +57,25 @@ public abstract class SummarySceneController extends Controller {
         updateStatLabels();
     }
 
+    private double resolveWidth() {
+        return mapPane.getWidth() > 0 ? mapPane.getWidth() : mapPane.getPrefWidth();
+    }
+    
+    private double resolveHeight() {
+        return mapPane.getHeight() > 0 ? mapPane.getHeight() : mapPane.getPrefHeight();
+    }
+    
     private void resizeCanvas() {
         if (canvas == null || mapPane == null) {
             return;
         }
-
-        double width = mapPane.getWidth() > 0 ? mapPane.getWidth() : mapPane.getPrefWidth();
-        double height = mapPane.getHeight() > 0 ? mapPane.getHeight() : mapPane.getPrefHeight();
+    
+        double width = resolveWidth();
+        double height = resolveHeight();
+    
         canvas.setWidth(width);
         canvas.setHeight(height);
+    
         drawMap();
     }
 
