@@ -19,7 +19,7 @@ public class PlayerTest {
         assertEquals(Constants.PLAYER_MAX_HEALTH, player.getHealth());
         assertEquals(2, player.getPosition().getX());
         assertEquals(3, player.getPosition().getY());
-        assertEquals(0, player.getFragmentCount());
+        assertEquals(0, player.getKeyFragmentCount());
         assertTrue(player.getMedkitCount() >= 0);
     }
 
@@ -62,23 +62,23 @@ public class PlayerTest {
     }
 
     @Test
-    public void addFragmentIncreasesFragmentCount() {
+    public void addKeyFragmentIncreasesKeyFragmentCount() {
         Player player = createDefaultPlayerAt(0, 0);
-        assertEquals(0, player.getFragmentCount());
+        assertEquals(0, player.getKeyFragmentCount());
 
         KeyFragment fragment1 = new KeyFragment();
-        player.addFragment(fragment1);
+        player.addKeyFragment(fragment1);
 
-        assertEquals(1, player.getFragmentCount());
+        assertEquals(1, player.getKeyFragmentCount());
 
         KeyFragment fragment2 = new KeyFragment();
-        player.addFragment(fragment2);
+        player.addKeyFragment(fragment2);
 
-        assertEquals(2, player.getFragmentCount());
+        assertEquals(2, player.getKeyFragmentCount());
     }
 
     @Test
-    public void addMedkitAndUseMedkitAffectsHealthAndCount() {
+    public void collectMedkitAndConsumeMedkitAffectsHealthAndCount() {
         Player player = createDefaultPlayerAt(0, 0);
 
         int initialCount = player.getMedkitCount();
@@ -87,10 +87,10 @@ public class PlayerTest {
         int damagedHealth = player.getHealth();
         assertEquals(Constants.PLAYER_MAX_HEALTH - 40, damagedHealth);
 
-        player.addMedkit();
+        player.collectMedkit();
         assertEquals(initialCount + 1, player.getMedkitCount());
 
-        int healedAmount = player.useMedkit();
+        int healedAmount = player.consumeMedkit();
         assertTrue("Healed amount should be positive", healedAmount > 0);
         assertEquals(damagedHealth + healedAmount, player.getHealth());
         assertEquals("Medkit count should be back to initial", initialCount, player.getMedkitCount());

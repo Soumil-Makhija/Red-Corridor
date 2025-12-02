@@ -15,20 +15,21 @@ public class Player {
     // maxHealth
     private Health health;
 
-    // A list to store all collected key fragments
-    private List<KeyFragment> fragments;
+    // S1: Bad Naming - Rename to keyFragments
+    private List<KeyFragment> keyFragments;
 
-    // How many medkits the player currently has
-    private static int medkitCount;
+    // S1: Bad Naming - Rename to medkits
+    private int medkits;
 
     // Constructor: sets up the player when the game starts
     // Refactor (S4, S9): Accepts Position and creates Health with max from
     // Constants
+    // S1: Bad Naming - keyFragments, medkits
     public Player(Position startPosition) {
         this.position = startPosition;
         this.health = new Health(Constants.PLAYER_MAX_HEALTH);
-        this.fragments = new ArrayList<>();
-        medkitCount = 0;
+        this.keyFragments = new ArrayList<>();
+        this.medkits = 0;
     }
 
     // Moves the player one step in the chosen direction
@@ -54,22 +55,22 @@ public class Player {
         health.decrease(amount);
     }
 
-    // Adds a collected key fragment to the player's inventory
-    public void addFragment(KeyFragment fragment) {
-        fragments.add(fragment);
+    // S1: Bad Naming - addKeyFragment
+    public void addKeyFragment(KeyFragment fragment) {
+        keyFragments.add(fragment);
     }
 
-    // Increases the number of medkits the player has
-    public void addMedkit() {
-        medkitCount++;
+    // S1: Bad Naming - collectMedkit
+    public void collectMedkit() {
+        medkits++;
     }
 
-    // Uses a medkit to heal the player (if available)
-    public int useMedkit() {
-        if (medkitCount > 0) {
+    // S1: Bad Naming - consumeMedkit
+    public int consumeMedkit() {
+        if (medkits > 0) {
             int before = health.getValue();
             heal(Constants.MEDKIT_HEAL_AMOUNT);
-            medkitCount--;
+            medkits--;
             return health.getValue() - before;
         }
         return 0;
@@ -84,11 +85,12 @@ public class Player {
         return health.getValue();
     }
 
-    public int getFragmentCount() {
-        return fragments.size();
+    // S1: Bad Naming - getKeyFragmentCount
+    public int getKeyFragmentCount() {
+        return keyFragments.size();
     }
 
     public int getMedkitCount() {
-        return medkitCount;
+        return medkits;
     }
 }

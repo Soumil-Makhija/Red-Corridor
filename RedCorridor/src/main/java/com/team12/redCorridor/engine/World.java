@@ -33,7 +33,7 @@ public class World {
     }
 
     public int fragmentsCollected() {
-        return player != null ? player.getFragmentCount() : 0;
+        return player != null ? player.getKeyFragmentCount() : 0;
     }
 
     public long elapsedMillis() {

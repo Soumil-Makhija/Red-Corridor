@@ -275,7 +275,7 @@ public class GameEngine implements Runnable {
 
     private String collectFragmentAt(int x, int y) {
         KeyFragment fragment = new KeyFragment();
-        world.player.addFragment(fragment);
+        world.player.addKeyFragment(fragment);
         world.hiddenItems[y][x] = MapVisuals.EMPTY;
         world.revealedItems[y][x] = MapVisuals.FRAGMENT;
         world.baseMap[y][x] = MapVisuals.OPEN_DOOR; // Walkable after collecting
@@ -283,7 +283,7 @@ public class GameEngine implements Runnable {
     }
 
     private String collectMedkitAt(int x, int y) {
-        world.player.addMedkit();
+        world.player.collectMedkit();
         world.hiddenItems[y][x] = MapVisuals.EMPTY;
         world.revealedItems[y][x] = MapVisuals.MEDKIT;
         world.baseMap[y][x] = MapVisuals.OPEN_DOOR; // Walkable after collecting
@@ -301,7 +301,7 @@ public class GameEngine implements Runnable {
     }
 
     private String useMedkitFromInventory() {
-        int healed = world.player.useMedkit();
+        int healed = world.player.consumeMedkit();
         if (healed > 0) {
             return "Medkit used. +" + healed + " HP.";
         }
@@ -359,7 +359,7 @@ public class GameEngine implements Runnable {
 
     private boolean hasCollectedAllFragments() {
         return world.totalFragmentsRequired <= 0
-                || world.player.getFragmentCount() >= world.totalFragmentsRequired;
+                || world.player.getKeyFragmentCount() >= world.totalFragmentsRequired;
     }
 
     private boolean atExit() {

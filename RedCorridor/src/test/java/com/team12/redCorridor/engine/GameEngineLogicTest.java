@@ -66,7 +66,7 @@ public class GameEngineLogicTest {
         int startY = world.player.getPosition().getY();
 
         world.baseMap[startY][startX + 1] = MapVisuals.EXIT;
-        world.totalFragmentsRequired = 1; 
+        world.totalFragmentsRequired = 1;
 
         boolean moved = invokeAttemptMove(1, 0);
 
@@ -81,7 +81,7 @@ public class GameEngineLogicTest {
         int startY = world.player.getPosition().getY();
 
         world.baseMap[startY][startX + 1] = MapVisuals.EXIT;
-        world.totalFragmentsRequired = 0; 
+        world.totalFragmentsRequired = 0;
 
         boolean moved = invokeAttemptMove(1, 0);
 
@@ -101,7 +101,7 @@ public class GameEngineLogicTest {
         world.baseMap[targetY][targetX] = MapVisuals.DOOR;
         world.hiddenItems[targetY][targetX] = MapVisuals.FRAGMENT;
 
-        int beforeFragments = world.player.getFragmentCount();
+        int beforeFragments = world.player.getKeyFragmentCount();
 
         boolean moved = invokeAttemptMove(1, 0);
         assertTrue(moved);
@@ -109,7 +109,7 @@ public class GameEngineLogicTest {
         assertEquals(targetX, world.player.getPosition().getX());
         assertEquals(targetY, world.player.getPosition().getY());
 
-        assertEquals(beforeFragments + 1, world.player.getFragmentCount());
+        assertEquals(beforeFragments + 1, world.player.getKeyFragmentCount());
         assertEquals(MapVisuals.EMPTY, world.hiddenItems[targetY][targetX]);
         assertEquals(MapVisuals.FRAGMENT, world.revealedItems[targetY][targetX]);
         assertEquals(MapVisuals.OPEN_DOOR, world.baseMap[targetY][targetX]);
@@ -164,7 +164,6 @@ public class GameEngineLogicTest {
 
     @Test
     public void runTest() throws Exception {
-
 
     }
 }
