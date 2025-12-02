@@ -276,7 +276,7 @@ public class GameSceneController extends Controller {
         int size = Constants.MAP_SIZE;
         int[][] revealed = new int[size][size];
         for (int y = 0; y < size; y++) {
-            System.arraycopy(world.map[y], 0, revealed[y], 0, size);
+            revealed[y] = world.map[y].clone();
             for (int x = 0; x < size; x++) {
                 int hidden = world.hiddenItems[y][x];
                 if (hidden != MapVisuals.EMPTY) {
