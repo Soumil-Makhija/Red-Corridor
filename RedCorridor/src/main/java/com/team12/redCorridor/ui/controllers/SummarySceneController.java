@@ -33,9 +33,7 @@ public abstract class SummarySceneController extends Controller {
 
     @FXML
     private void initialize() {
-        if (mapPane == null) {
-            return;
-        }
+        
 
         // creating new map
         canvas = new Canvas(mapPane.getPrefWidth(), mapPane.getPrefHeight());
