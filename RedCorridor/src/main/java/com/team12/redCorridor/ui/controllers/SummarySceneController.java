@@ -79,29 +79,37 @@ public abstract class SummarySceneController extends Controller {
         MapVisuals.draw(graphicsContext, tiles);
     }
 
+    private void updateFragments() {
+        String fragmentProgress = summaryStats.getFragmentsRequired() > 0
+                ? summaryStats.getFragmentsCollected() + "/" + summaryStats.getFragmentsRequired()
+                : String.valueOf(summaryStats.getFragmentsCollected());
+        fragmentsStatLabel.setText("Fragments retrieved: " + fragmentProgress);
+    }
+    
+    private void updateDrones() {
+        dronesStatLabel.setText("Drones triggered: " + summaryStats.getDronesTriggered());
+    }
+    
+    private void updateTraps() {
+        trapsStatLabel.setText("Traps triggered: " + summaryStats.getTrapsTriggered());
+    }
+    
+    private void updateTime() {
+        timeStatLabel.setText("Time taken: " + formatElapsedTime(summaryStats.getElapsedMillis()));
+    }
+    
+    private void updateHealth() {
+        healthStatLabel.setText("Health remaining: " + summaryStats.getHealthRemaining());
+    }
+    
     private void updateStatLabels() {
-        if (summaryStats == null) {
-            return;
-        }
-
-        if (fragmentsStatLabel != null) {
-            String fragmentProgress = summaryStats.getFragmentsRequired() > 0
-                    ? summaryStats.getFragmentsCollected() + "/" + summaryStats.getFragmentsRequired()
-                    : String.valueOf(summaryStats.getFragmentsCollected());
-            fragmentsStatLabel.setText("Fragments retrieved: " + fragmentProgress);
-        }
-        if (dronesStatLabel != null) {
-            dronesStatLabel.setText("Drones triggered: " + summaryStats.getDronesTriggered());
-        }
-        if (trapsStatLabel != null) {
-            trapsStatLabel.setText("Traps triggered: " + summaryStats.getTrapsTriggered());
-        }
-        if (timeStatLabel != null) {
-            timeStatLabel.setText("Time taken: " + formatElapsedTime(summaryStats.getElapsedMillis()));
-        }
-        if (healthStatLabel != null) {
-            healthStatLabel.setText("Health remaining: " + summaryStats.getHealthRemaining());
-        }
+        if (summaryStats == null) return;
+    
+        updateFragments();
+        updateDrones();
+        updateTraps();
+        updateTime();
+        updateHealth();
     }
 
     private int[][] defaultMap() {
