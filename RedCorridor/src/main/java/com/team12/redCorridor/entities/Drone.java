@@ -2,28 +2,36 @@ package com.team12.redCorridor.entities;
 
 import com.team12.redCorridor.utils.Constants;
 
-// This class represents an enemy drone that can move toward the player
+/**
+ * Enemy drone that moves toward the player.
+ */
 public class Drone {
 
     // The drone's current position on the map
     private Position position;
 
-    // Refactor (S4, S9): Use Damage value object for drone damage
+    // Use Damage value object for drone damage
     private Damage damage;
 
     // Whether the drone is still active (not destroyed)
     private boolean active;
 
-    // Constructor is called when we create a new Drone
-    // It sets the starting position, damage, and marks it as active
+    /**
+     * Creates a new drone at the given position.
+     *
+     * @param startPosition starting position
+     */
     public Drone(Position startPosition) {
         this.position = startPosition;
         this.damage = new Damage(Constants.DRONE_DAMAGE);
         this.active = true;
     }
 
-    // This method makes the drone move one step closer to the target each time it’s
-    // called
+    /**
+     * Moves the drone one step closer to the target position.
+     *
+     * @param target position to move toward
+     */
     public void moveToward(Position target) {
         // Stop if this object is not active or the target doesn't exist
         if (!active || target == null) {
@@ -48,21 +56,32 @@ public class Drone {
         }
     }
 
-    // Turns off/deactivates the drone so it stops moving
+    /**
+     * Deactivates the drone.
+     */
     public void deactivate() {
         active = false;
     }
 
     // Getters (to read private values)
+    /**
+     * Returns true if the drone is active.
+     */
     public boolean isActive() {
         return active;
-    } // Check if drone is still active
+    }
 
+    /**
+     * Gets the drone's position.
+     */
     public Position getPosition() {
         return position;
-    } // Get current position
+    }
 
+    /**
+     * Gets the damage value of the drone.
+     */
     public int getDamage() {
         return damage.getValue();
-    } // Get how much damage it can deal
+    }
 }

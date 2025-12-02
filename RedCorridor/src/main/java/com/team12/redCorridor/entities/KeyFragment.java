@@ -1,9 +1,12 @@
 package com.team12.redCorridor.entities;
 
-// Refactor: Removed unused 'collected' field and related methods (S2, S7)
-// This class represents a collectible key fragment in the game
+/**
+ * Collectible key fragment.
+ */
 public class KeyFragment {
-    // No fields or methods needed for current usage
+    /**
+     * Creates a new key fragment.
+     */
     public KeyFragment() {
         // No state needed
     }

@@ -5,34 +5,50 @@ import java.util.List;
 import com.team12.redCorridor.utils.Constants;
 import com.team12.redCorridor.engine.*;
 
-// This class represents the player character in the game
+/**
+ * Represents the player character in the game.
+ * Handles position, health, key fragments, and medkit inventory.
+ */
 public class Player {
 
-    // The player's current position on the map
+    /**
+     * The player's current position on the map.
+     */
     private Position position;
 
-    // Refactor (S4, S9): Use Health value object to encapsulate health and
-    // maxHealth
+    /**
+     * Encapsulates player's health and max health.
+     */
     private Health health;
 
-    // S1: Bad Naming - Rename to keyFragments
+    /**
+     * List of collected key fragments.
+     */
     private List<KeyFragment> keyFragments;
 
-    // S6: Low Cohesion - Extract medkit logic to MedkitInventory
+    /**
+     * Manages medkit collection and usage.
+     */
     private MedkitInventory medkitInventory;
 
-    // Constructor: sets up the player when the game starts
-    // Refactor (S4, S9): Accepts Position and creates Health with max from
-    // Constants
-    // S1: Bad Naming - keyFragments, medkits
+    /**
+     * Constructs a new Player at the given starting position.
+     * Initializes health, key fragments, and medkit inventory.
+     *
+     * @param startPosition the initial position of the player
+     */
     public Player(Position startPosition) {
         this.position = startPosition;
         this.health = new Health(Constants.PLAYER_MAX_HEALTH);
         this.keyFragments = new ArrayList<>();
-        this.medkitInventory = new MedkitInventory(); // S6
+        this.medkitInventory = new MedkitInventory();
     }
 
-    // Moves the player one step in the chosen direction
+    /**
+     * Moves the player one step in the given direction.
+     *
+     * @param dir the direction to move (UP, DOWN, LEFT, RIGHT)
+     */
     public void move(Direction dir) {
         if (dir == null)
             return; // do nothing if direction not given
@@ -46,49 +62,83 @@ public class Player {
         }
     }
 
-    // Refactor (S4, S9): Use Health methods for healing and damage
+    /**
+     * Heals the player by the specified amount.
+     *
+     * @param amount the amount to heal
+     */
     public void heal(int amount) {
         health.increase(amount);
     }
 
+    /**
+     * Reduces the player's health by the specified amount.
+     *
+     * @param amount the amount of damage to take
+     */
     public void takeDamage(int amount) {
         health.decrease(amount);
     }
 
-    // S1: Bad Naming - addKeyFragment
+    /**
+     * Adds a key fragment to the player's collection.
+     *
+     * @param fragment the key fragment to add
+     */
     public void addKeyFragment(KeyFragment fragment) {
         keyFragments.add(fragment);
     }
 
-    // S1: Bad Naming - collectMedkit
+    /**
+     * Collects a medkit and adds it to the inventory.
+     */
     public void collectMedkit() {
-        // S6: Delegate to MedkitInventory
         medkitInventory.collectMedkit();
     }
 
-    // S1: Bad Naming - consumeMedkit
+    /**
+     * Uses a medkit from inventory to heal the player.
+     *
+     * @return the amount healed, or 0 if no medkits available
+     */
     public int consumeMedkit() {
-        // S6: Delegate to MedkitInventory
         int healed = medkitInventory.consumeMedkit(health);
         return healed;
     }
 
-    // --- Getters (to safely access private values) ---
+    /**
+     * Gets the player's current position.
+     *
+     * @return the position
+     */
     public Position getPosition() {
         return position;
     }
 
+    /**
+     * Gets the player's current health value.
+     *
+     * @return the health value
+     */
     public int getHealth() {
         return health.getValue();
     }
 
-    // S1: Bad Naming - getKeyFragmentCount
+    /**
+     * Gets the number of key fragments collected.
+     *
+     * @return the count of key fragments
+     */
     public int getKeyFragmentCount() {
         return keyFragments.size();
     }
 
+    /**
+     * Gets the number of medkits in inventory.
+     *
+     * @return the count of medkits
+     */
     public int getMedkitCount() {
-        // S6: Delegate to MedkitInventory
         return medkitInventory.getMedkitCount();
     }
 }
