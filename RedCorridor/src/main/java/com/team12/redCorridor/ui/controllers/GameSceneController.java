@@ -138,7 +138,7 @@ public class GameSceneController extends Controller {
                 javafx.application.Platform.runLater(() -> handleStateChange(state));
             }
         });
-        engine.start();
+        engine.startEngineThread();
         updateStaticHud();
     }
     
@@ -264,7 +264,7 @@ public class GameSceneController extends Controller {
 
     private void stopEngine() {
         if (engine != null) {
-            engine.stop();
+            engine.stopEngineThread();
             engine = null;
         }
     }

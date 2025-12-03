@@ -35,10 +35,10 @@ public class Main {
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.out.println("Shutdown hook: stopping engine...");
-            engine.stop();
+            engine.stopEngineThread();
         }));
         // Start the game engine (runs on its own thread)
-        engine.start(); // starts a simple game loop; expand engine as needed
+        engine.startEngineThread(); // starts a simple game loop; expand engine as needed
         // When running from an IDE or terminal, let the user press ENTER to stop the
         // engine.
         System.out.println("Press ENTER to stop the engine.");
@@ -49,6 +49,6 @@ public class Main {
         }
 
         System.out.println("Stopping engine...");
-        engine.stop();
+        engine.stopEngineThread();
     }
 }

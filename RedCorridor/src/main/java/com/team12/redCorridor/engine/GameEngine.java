@@ -46,7 +46,7 @@ public class GameEngine implements Runnable {
      * Start the engine. If already running this is a no-op.
      * Creates and starts the engine thread which executes run().
      */
-    public void start() {
+    public void startEngineThread() {
         if (running)
             return; // already running, ignore
         running = true;
@@ -58,7 +58,7 @@ public class GameEngine implements Runnable {
      * Stop the engine. Clears the running flag and joins the engine thread
      * so stop() only returns once the loop has exited.
      */
-    public void stop() {
+    public void stopEngineThread() {
         running = false;
         try {
             if (thread != null)
