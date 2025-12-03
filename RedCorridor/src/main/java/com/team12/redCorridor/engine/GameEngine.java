@@ -183,11 +183,11 @@ public class GameEngine implements Runnable {
         int nx = prevX + dx;
         int ny = prevY + dy;
 
-        if (!isWithinBounds(nx, ny)) {
+        if (isOutOfBounds(nx, ny)) {
             setMessage("Can't move outside the map.");
             return false;
         }
-        if (!isWalkable(nx, ny)) {
+        if (isWall(nx, ny)) {
             setMessage("Blocked by a wall.");
             return false;
         }
@@ -262,12 +262,12 @@ public class GameEngine implements Runnable {
         return true;
     }
 
-    private boolean isWithinBounds(int x, int y) {
-        return x >= 0 && x < Constants.MAP_SIZE && y >= 0 && y < Constants.MAP_SIZE;
+    private boolean isOutOfBounds(int x, int y) {
+        return !(x >= 0 && x < Constants.MAP_SIZE && y >= 0 && y < Constants.MAP_SIZE);
     }
 
-    private boolean isWalkable(int x, int y) {
-        return world.baseMap[y][x] != MapVisuals.WALL;
+    private boolean isWall(int x, int y) {
+        return world.baseMap[y][x] == MapVisuals.WALL;
     }
 
     private String collectFragmentAt(int x, int y) {
@@ -334,7 +334,7 @@ public class GameEngine implements Runnable {
     }
 
     private boolean canSpawnDroneAt(int x, int y) {
-        if (!isWithinBounds(x, y)) {
+        if (isOutOfBounds(x, y)) {
             return false;
         }
         int tile = world.baseMap[y][x];
@@ -385,7 +385,7 @@ public class GameEngine implements Runnable {
 
             int tx = dp.getX();
             int ty = dp.getY();
-            if (!isWithinBounds(tx, ty) || !isWalkable(tx, ty)) {
+            if (isOutOfBounds(tx, ty) || isWall(tx, ty)) {
                 dp.setX(ox);
                 dp.setY(oy);
             }
