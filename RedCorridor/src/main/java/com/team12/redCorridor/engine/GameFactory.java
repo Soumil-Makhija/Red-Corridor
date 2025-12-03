@@ -78,10 +78,8 @@ public class GameFactory {
         world.player = new Player(new Position(start.getX(), start.getY()));
         removePosition(openTiles, start);
 
-        // Remove any tiles already marked as exit
-        openTiles.removeIf(pos -> world.baseMap[pos.getY()][pos.getX()] == MapVisuals.EXIT);
-
         List<Position> placementPool = new ArrayList<>(openTiles);
+
         Collections.shuffle(placementPool, random);
 
         int fragmentsPlaced = placeHiddenTiles(placementPool, world.baseMap, world.hiddenItems, MapVisuals.FRAGMENT,
