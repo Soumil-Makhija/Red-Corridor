@@ -81,4 +81,18 @@ public class MazeLoader {
             throw new RuntimeException("Failed to load maze " + fileName, e);
         }
     }
+    private void validateRowCount(int row, String fileName) {
+        if (row >= Constants.MAP_SIZE) {
+            throw new IllegalStateException(
+                    "Maze " + fileName + " has more than " + Constants.MAP_SIZE + " rows.");
+        }
+    }
+
+    private void validateRowLength(String line, int row, String fileName) {
+        if (line.length() != Constants.MAP_SIZE) {
+            throw new IllegalStateException(
+                    "Row " + row + " in maze " + fileName + " is not equal to "
+                            + Constants.MAP_SIZE + " characters.");
+        }
+    }
 }
