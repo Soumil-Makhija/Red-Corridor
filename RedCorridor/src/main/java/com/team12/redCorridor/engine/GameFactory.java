@@ -141,28 +141,13 @@ public class GameFactory {
         return dx * dx + dy * dy;
     }
 
+     /**
+     * Backwards-compatible wrapper that now delegates to World.refreshDynamicMap().
+     * The real logic lives on World so the world manages its own rendering state.
+     */
     public static void refreshDynamicMap(World world) {
-        for (int y = 0; y < Constants.MAP_SIZE; y++) {
-            System.arraycopy(world.baseMap[y], 0, world.map[y], 0, Constants.MAP_SIZE);
-            for (int x = 0; x < Constants.MAP_SIZE; x++) {
-                if (world.baseMap[y][x] == MapVisuals.OPEN_DOOR) {
-                    int revealed = world.revealedItems[y][x];
-                    if (revealed != MapVisuals.EMPTY) {
-                        world.map[y][x] = revealed;
-                    }
-                }
-            }
-        }
-
-        for (Drone drone : world.drones) {
-            if (drone.isActive()) {
-                Position pos = drone.getPosition();
-                world.map[pos.getY()][pos.getX()] = MapVisuals.DRONE;
-            }
-        }
-
-        if (world.player != null) {
-            world.map[world.player.getPosition().getY()][world.player.getPosition().getX()] = MapVisuals.PLAYER;
+        if (world != null) {
+            world.refreshDynamicMap();
         }
     }
 }
