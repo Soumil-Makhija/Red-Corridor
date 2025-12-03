@@ -100,13 +100,10 @@ public class GameEngine implements Runnable {
 
     /**
      * Update game logic. This should advance game state, process input,
-     * move entities, and perform collision checks. Currently a placeholder
+     * move entities, and perform collision checks.
      * that prints a tick to the console.
      */
     private void update() {
-        if (state != GameState.PLAYING)
-            return;
-
         long now = System.nanoTime();
 
         // 1) Read input
@@ -122,26 +119,20 @@ public class GameEngine implements Runnable {
                 dx = 1;
         }
 
-        boolean playerMoved = false;
         // 2) Move player (at most one tile per frame)
         if ((dx != 0 || dy != 0) && now - lastMoveTimeNs >= MOVE_INTERVAL_NS) {
             if (attemptMove(world.player, dx, dy)) {
                 lastMoveTimeNs = now;
-                playerMoved = true;
+                // 3) Move drones + apply damage (only after player moved)
+                int dmg = moveDronesTowardPlayer();
+                if (dmg > 0) {
+                    setMessage("Drone caught you! -" + dmg + " HP");
+                }
             }
         }
 
-        // 3) Move drones + apply damage (only after player moved)
-        if (playerMoved) {
-            int dmg = moveDronesTowardPlayer();
-            if (dmg > 0) {
-                setMessage("Drone caught you! -" + dmg + " HP");
-            }
-        }
-
-        String medkitMessage = null;
         if (input != null && input.consumeMedkitRequest()) {
-            medkitMessage = useMedkitFromInventory();
+            setMessage(useMedkitFromInventory());
         }
 
         // 4) Win/Lose checks
@@ -152,10 +143,6 @@ public class GameEngine implements Runnable {
             nextState = GameState.WIN;
         }
 
-        // 5) Notify UI
-        if (medkitMessage != null) {
-            setMessage(medkitMessage);
-        }
         GameFactory.refreshDynamicMap(world); // update new icons
         if (listener != null)
             listener.onFrame(buildSnapshot());
