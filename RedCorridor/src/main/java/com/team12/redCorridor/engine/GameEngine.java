@@ -47,8 +47,6 @@ public class GameEngine implements Runnable {
      * Creates and starts the engine thread which executes run().
      */
     public void startEngineThread() {
-        if (running)
-            return; // already running, ignore
         running = true;
         thread = new Thread(this, "GameEngine-Thread");
         thread.start();
@@ -263,7 +261,7 @@ public class GameEngine implements Runnable {
     }
 
     private boolean isOutOfBounds(int x, int y) {
-        return !(x >= 0 && x < Constants.MAP_SIZE && y >= 0 && y < Constants.MAP_SIZE);
+        return x < 0 || x > Constants.MAP_SIZE || y < 0 || y > Constants.MAP_SIZE;
     }
 
     private boolean isWall(int x, int y) {
