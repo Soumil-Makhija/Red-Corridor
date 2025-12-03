@@ -203,7 +203,7 @@ public class GameEngine implements Runnable {
         player.getPosition().setY(ny);
 
         // Interact with tile after moving
-        String interactionMessage = null;
+        String interactionMessage;
 
         // Check if this is a closed door - reveal and interact with hidden item
         if (tile == MapVisuals.DOOR) {
