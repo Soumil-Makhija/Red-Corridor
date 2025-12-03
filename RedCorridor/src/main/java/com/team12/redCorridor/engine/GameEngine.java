@@ -73,9 +73,6 @@ public class GameEngine implements Runnable {
      * TARGET_FPS frames per second. It uses System.nanoTime() for timing and
      * sleeps briefly when ahead of schedule to avoid busy-waiting.
      */
-    public GameState getState() {
-        return state;
-    }
 
     public World getWorld() {
         return world;
@@ -361,7 +358,6 @@ public class GameEngine implements Runnable {
     private boolean hasCollectedAllFragments() {
         boolean noFragmentsRequired = world.totalFragmentsRequired <= 0;
         boolean allFragmentsCollected = world.player.getKeyFragmentCount() >= world.totalFragmentsRequired;
-
         return noFragmentsRequired || allFragmentsCollected;
     }
 
