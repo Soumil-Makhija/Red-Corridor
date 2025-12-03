@@ -18,8 +18,19 @@ import com.team12.redCorridor.utils.Constants;
  * tiles.
  */
 public class GameFactory {
-    private final MazeLoader mazeLoader = new MazeLoader();
-    private final Random random = new Random();
+    private final MazeLoader mazeLoader;
+    private final Random random;
+
+    // Default constructor used by the game
+    public GameFactory() {
+        this(new MazeLoader(), new Random());
+    }
+
+    // Constructor for tests or custom setups
+    public GameFactory(MazeLoader mazeLoader, Random random) {
+        this.mazeLoader = mazeLoader;
+        this.random = random;
+    }
 
     // main world
     public World createDefaultWorld() {
