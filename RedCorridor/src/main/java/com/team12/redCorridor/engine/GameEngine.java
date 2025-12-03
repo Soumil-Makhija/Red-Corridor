@@ -359,8 +359,10 @@ public class GameEngine implements Runnable {
     }
 
     private boolean hasCollectedAllFragments() {
-        return world.totalFragmentsRequired <= 0
-                || world.player.getKeyFragmentCount() >= world.totalFragmentsRequired;
+        boolean noFragmentsRequired = world.totalFragmentsRequired <= 0;
+        boolean allFragmentsCollected = world.player.getKeyFragmentCount() >= world.totalFragmentsRequired;
+
+        return noFragmentsRequired || allFragmentsCollected;
     }
 
     private boolean atExit() {
