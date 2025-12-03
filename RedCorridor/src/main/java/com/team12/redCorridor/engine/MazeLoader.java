@@ -57,18 +57,15 @@ public class MazeLoader {
                 if (line.isEmpty()) {
                     continue;
                 }
-                if (row >= Constants.MAP_SIZE) {
-                    throw new IllegalStateException(
-                            "Maze " + fileName + " has more than " + Constants.MAP_SIZE + " rows.");
-                }
-                if (line.length() != Constants.MAP_SIZE) {
-                    throw new IllegalStateException(
-                            "Row " + row + " in maze " + fileName + " is not equal to " + Constants.MAP_SIZE
-                                    + " characters.");
-                }
+                validateRowCount(row, fileName);
+                validateRowLength(line, row, fileName);
+
                 for (int col = 0; col < Constants.MAP_SIZE; col++) {
-                    grid[row][col] = line.charAt(col);
+                    char c = line.charAt(col);
+                    validateCell(c, row, col, fileName);
+                    grid[row][col] = c;
                 }
+
                 row++;
             }
             if (row != Constants.MAP_SIZE) {
@@ -93,6 +90,14 @@ public class MazeLoader {
             throw new IllegalStateException(
                     "Row " + row + " in maze " + fileName + " is not equal to "
                             + Constants.MAP_SIZE + " characters.");
+        }
+    }
+
+    private void validateCell(char c, int row, int col, String fileName) {
+        if (c != '#' && c != 'E' && c != ' ') {
+            throw new IllegalStateException(
+                "Invalid character '" + c + "' at (" + row + "," + col + ") in maze " + fileName
+            );
         }
     }
 }
