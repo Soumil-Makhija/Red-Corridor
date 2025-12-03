@@ -133,7 +133,10 @@ public class GameFactory {
         }
     }
 
-    private int distanceSquared(Position pos, int targetX, int targetY) {
+    /**
+     * Helper for comparing distances without computing square roots.
+     */
+    private static int distanceSquared(Position pos, int targetX, int targetY) {
         int dx = pos.getX() - targetX;
         int dy = pos.getY() - targetY;
         return dx * dx + dy * dy;
